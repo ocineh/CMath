@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-void hello(void);
-
 typedef struct chiffre {
 	struct chiffre *suivant;
 	char c;
