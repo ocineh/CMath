@@ -1,5 +1,5 @@
-#ifndef PROJET_LIBRARY_H
-#define PROJET_LIBRARY_H
+#ifndef PROJET_UNBOUNDED_INT_H
+#define PROJET_UNBOUNDED_INT_H
 
 #include <stddef.h>
 
@@ -94,4 +94,4 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b);
  */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
 
-#endif //PROJET_LIBRARY_H
+#endif //PROJET_UNBOUNDED_INT_H
