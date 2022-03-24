@@ -17,6 +17,13 @@ typedef struct {
 } unbounded_int;
 
 /**
+ * Print the digits composing an unbounded_int.
+ *
+ * @param u an instance of unbounded_int
+ */
+void print_unbounded_int(unbounded_int *u);
+
+/**
  * Create an unbounded_int instance from a string.
  * /!\ If the string does not correspond to a number,
  * return an instance of unbounded_int with the field sign == '*'.

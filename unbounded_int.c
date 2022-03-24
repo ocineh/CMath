@@ -3,6 +3,20 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <stdio.h>
+
+void print_unbounded_int(unbounded_int *u) {
+	if(u->signe == '*') printf("NaN\n");
+	else {
+		printf("%c", u->signe);
+		chiffre *actual = u->premier;
+		while(actual != NULL) {
+			printf("%c", actual->c);
+			actual = actual->suivant;
+		}
+		printf("\n");
+	}
+}
 
 static void add_chiffre(unbounded_int *u, char n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
