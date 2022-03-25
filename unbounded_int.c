@@ -64,3 +64,16 @@ unbounded_int ll2unbounded_int(long long int i) {
 	sprintf(tmp, "%lli", i);
 	return string2unbounded_int(tmp);
 }
+
+char *unbounded_int2string(unbounded_int i) {
+	char *res = malloc(sizeof(char) * (i.len + 2));
+	res[i.len + 1] = '\0';
+	res[0] = i.signe;
+	
+	chiffre *p_chiffre = i.premier;
+	for(int j = 1; j <= i.len && p_chiffre != NULL; ++j) {
+		res[j] = p_chiffre->c;
+		p_chiffre = p_chiffre->suivant;
+	}
+	return res;
+}
