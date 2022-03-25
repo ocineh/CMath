@@ -50,3 +50,17 @@ unbounded_int string2unbounded_int(const char *e) {
 	}
 	return result;
 }
+
+unbounded_int ll2unbounded_int(long long int i) {
+	long long n = i;
+	unsigned count = 0;
+	while(n > 0) {
+		++count;
+		n /= 10;
+	}
+	
+	char tmp[count + 1];
+	tmp[count] = '\0';
+	sprintf(tmp, "%lli", i);
+	return string2unbounded_int(tmp);
+}
