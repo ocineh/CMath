@@ -119,3 +119,8 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 	}
 	return 0;
 }
+
+int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
+	unbounded_int tmp = ll2unbounded_int(b);
+	return unbounded_int_cmp_unbounded_int(a, tmp);
+}
