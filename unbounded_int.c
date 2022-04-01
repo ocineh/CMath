@@ -273,3 +273,11 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	}
 	return NaN;
 }
+
+unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
+	a.signe = '+';
+	b.signe = '-';
+	unbounded_int r = unbounded_int_somme(a, b);
+	r.signe = '+';
+	return r;
+}
