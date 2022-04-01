@@ -3,4 +3,6 @@ project(projet C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_library(projet unbounded_int.c calc_unbounded_int.c calc_unbounded_int.h)
+file(GLOB_RECURSE SOURCES src/*.c)
+file(GLOB_RECURSE HEADERS src/*.h)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
