@@ -52,6 +52,7 @@ unbounded_int string2unbounded_int(const char *e) {
 }
 
 unbounded_int ll2unbounded_int(long long int i) {
+	if(i == 0) return string2unbounded_int("0");
 	long long n = i;
 	unsigned count = 0;
 	while(n > 0) {
@@ -94,6 +95,22 @@ static short ctoi(const char c) {
 	}
 }
 
+static short itoc(const short i) {
+	switch(abs(i)) {
+		case 0: return '0';
+		case 1: return '1';
+		case 2: return '2';
+		case 3: return '3';
+		case 4: return '4';
+		case 5: return '5';
+		case 6: return '6';
+		case 7: return '7';
+		case 8: return '8';
+		case 9: return '9';
+		default: return '*';
+	}
+}
+
 static int cpm(char a, char b) {
 	short i = ctoi(a), j = ctoi(b);
 	if(i < j) return -1;
@@ -120,7 +137,139 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 	return 0;
 }
 
+static int cmp_abs(unbounded_int *a, unbounded_int *b) {
+	char tmp_a = a->signe, tmp_b = b->signe;
+	a->signe = b->signe = '+';
+	int tmp = unbounded_int_cmp_unbounded_int(*a, *b);
+	a->signe = tmp_a;
+	b->signe = tmp_b;
+	return tmp;
+}
+
 int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
 	unbounded_int tmp = ll2unbounded_int(b);
 	return unbounded_int_cmp_unbounded_int(a, tmp);
+}
+
+static void add_begin(unbounded_int *u, short n) {
+	chiffre *p_chiffre = malloc(sizeof(chiffre));
+	p_chiffre->c = itoc(n);
+	p_chiffre->suivant = p_chiffre->precedent = NULL;
+	
+	if(u->premier == NULL) {
+		u->premier = u->dernier = p_chiffre;
+	} else {
+		p_chiffre->suivant = u->premier;
+		u->premier->precedent = p_chiffre;
+		u->premier = p_chiffre;
+	}
+	++u->len;
+}
+
+static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
+	if(a->signe == b->signe) {
+		unbounded_int r = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
+		short hold = 0, tmp;
+		
+		chiffre *p_a = a->dernier, *p_b = b->dernier;
+		while(p_a != NULL && p_b != NULL) {
+			tmp = ctoi(p_a->c) + ctoi(p_b->c) + hold;
+			hold = tmp / 10;
+			tmp %= 10;
+			add_begin(&r, tmp);
+			p_a = p_a->precedent;
+			p_b = p_b->precedent;
+		}
+		
+		chiffre *p = p_a == NULL ? p_b : p_a;
+		while(p != NULL) {
+			tmp = ctoi(p->c) + hold;
+			hold = tmp / 10;
+			tmp %= 10;
+			add_begin(&r, tmp);
+			p = p->precedent;
+		}
+		
+		if(hold != 0) add_begin(&r, hold);
+		return r;
+	}
+	return NaN;
+}
+
+static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
+	if(a->signe != b->signe) {
+		unbounded_int r = { .signe= (char) (cmp_abs(a, b) == 1 ? a->signe
+															   : b->signe), .len=0, .premier=NULL, .dernier=NULL };
+		short hold = 0, tmp = 0;
+		
+		chiffre *p_a = a->dernier, *p_b = b->dernier;
+		while(p_a != NULL && p_b != NULL) {
+			short i = ctoi(p_a->c), j = ctoi(p_b->c);
+			if(i == j) {
+				if(hold < 0) tmp = -10 - (10 - ((j + abs(hold)) - i));
+				else tmp = hold;
+			} else if(i < j) tmp = -10 - (10 - ((j + abs(hold)) - i));
+			else tmp = i - j + hold;
+			
+			hold = tmp / 10;
+			tmp %= 10;
+			add_begin(&r, tmp);
+			p_a = p_a->precedent;
+			p_b = p_b->precedent;
+		}
+		
+		chiffre *p = p_a == NULL ? p_b : p_a;
+		while(p != NULL) {
+			short i = ctoi(p->c);
+			if(hold < 0 && -hold > i) tmp = -10 - (10 - (abs(hold) - i));
+			else tmp = i + hold;
+			hold = tmp / 10;
+			tmp %= 10;
+			add_begin(&r, tmp);
+			p = p->precedent;
+		}
+		
+		if(hold != 0) add_begin(&r, hold);
+		return r;
+	}
+	return NaN;
+}
+
+static unbounded_int strip(unbounded_int u) {
+	if(u.len > 1 && u.premier->c == '0') {
+		chiffre *actual = u.premier;
+		while(actual != NULL && actual->c == '0') {
+			actual = actual->suivant;
+			--u.len;
+		}
+		if(actual == NULL) return ZERO;
+		
+		chiffre *precedent = actual->precedent;
+		while(precedent != NULL) {
+			chiffre *tmp = precedent;
+			precedent = precedent->precedent;
+			free(tmp);
+		}
+		
+		actual->precedent = NULL;
+		u.premier = actual;
+	}
+	return u;
+}
+
+unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
+	if(a.signe == '*' || b.signe == '*') return NaN;
+	if(isZERO(a)) return b;
+	if(isZERO(b)) return a;
+	
+	int cmp = cmp_abs(&a, &b);
+	if(a.signe != b.signe && cmp == 0) return ZERO;
+	
+	if(a.signe == b.signe) return strip(add_same_sign(&a, &b));
+	if(a.signe != b.signe) {
+		if(cmp == 0) return ZERO;
+		if(cmp == -1) return strip(add_diff_sign(&b, &a));
+		if(cmp == 1) return strip(add_diff_sign(&a, &b));
+	}
+	return NaN;
 }
