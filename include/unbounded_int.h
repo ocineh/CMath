@@ -21,6 +21,8 @@ typedef struct {
 	chiffre *dernier;
 } unbounded_int;
 
+void free_unbounded_int(unbounded_int *a);
+
 /**
  * Print the digits composing an unbounded_int.
  *

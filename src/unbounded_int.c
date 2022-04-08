@@ -280,3 +280,13 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
 	r.signe = '+';
 	return r;
 }
+
+static void free_chiffre(chiffre *c) {
+	if(c->suivant != NULL) free_chiffre(c->suivant);
+	if(c->precedent != NULL) free_chiffre(c->precedent);
+	free(c);
+}
+
+void free_unbounded_int(unbounded_int *a) {
+	free_chiffre(a->premier);
+}
