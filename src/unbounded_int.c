@@ -290,3 +290,11 @@ static void free_chiffre(chiffre *c) {
 void free_unbounded_int(unbounded_int *a) {
 	free_chiffre(a->premier);
 }
+
+unbounded_int copy_unbounded_int(unbounded_int *a) {
+	if(a == NULL) return NaN;
+	unbounded_int result = { .signe=a->signe, .len=a->len, .premier=NULL, .dernier=NULL };
+	for(chiffre *actual = a->premier; actual != NULL; actual = actual->suivant)
+		add_chiffre(&result, actual->c);
+	return result;
+}

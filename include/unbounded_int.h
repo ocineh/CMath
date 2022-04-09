@@ -106,4 +106,6 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b);
  */
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
 
+unbounded_int copy_unbounded_int(unbounded_int *a);
+
 #endif //PROJET_UNBOUNDED_INT_H
