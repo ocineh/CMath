@@ -32,6 +32,28 @@ static void add_chiffre(unbounded_int *u, char n) {
 	}
 }
 
+static unbounded_int strip(unbounded_int u) {
+	if(u.len > 1 && u.premier->c == '0') {
+		chiffre *actual = u.premier;
+		while(actual != NULL && actual->c == '0') {
+			actual = actual->suivant;
+			--u.len;
+		}
+		if(actual == NULL) return ZERO;
+		
+		chiffre *precedent = actual->precedent;
+		while(precedent != NULL) {
+			chiffre *tmp = precedent;
+			precedent = precedent->precedent;
+			free(tmp);
+		}
+		
+		actual->precedent = NULL;
+		u.premier = actual;
+	}
+	return u;
+}
+
 unbounded_int string2unbounded_int(const char *e) {
 	unbounded_int result = { .signe='*', .len = 0 };
 	size_t len = strlen(e);
@@ -47,13 +69,13 @@ unbounded_int string2unbounded_int(const char *e) {
 		
 		while(i < len && isdigit(e[i])) add_chiffre(&result, e[i++]);
 	}
-	return result;
+	return strip(result);
 }
 
 unbounded_int ll2unbounded_int(long long int i) {
 	if(i == 0) return string2unbounded_int("0");
-	long long n = i;
-	unsigned count = 0;
+	long long n = i < 0 ? -i : i;
+	unsigned count = i < 0 ? 1 : 0;
 	while(n > 0) {
 		++count;
 		n /= 10;
@@ -234,28 +256,6 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 	return NaN;
 }
 
-static unbounded_int strip(unbounded_int u) {
-	if(u.len > 1 && u.premier->c == '0') {
-		chiffre *actual = u.premier;
-		while(actual != NULL && actual->c == '0') {
-			actual = actual->suivant;
-			--u.len;
-		}
-		if(actual == NULL) return ZERO;
-		
-		chiffre *precedent = actual->precedent;
-		while(precedent != NULL) {
-			chiffre *tmp = precedent;
-			precedent = precedent->precedent;
-			free(tmp);
-		}
-		
-		actual->precedent = NULL;
-		u.premier = actual;
-	}
-	return u;
-}
-
 unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	if(a.signe == '*' || b.signe == '*') return NaN;
 	if(isZERO(a)) return b;
@@ -282,19 +282,48 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
 }
 
 static void free_chiffre(chiffre *c) {
-	if(c->suivant != NULL) free_chiffre(c->suivant);
-	if(c->precedent != NULL) free_chiffre(c->precedent);
-	free(c);
+	if(c != NULL) {
+		if(c->suivant != NULL) free_chiffre(c->suivant);
+		free(c);
+		c = NULL;
+	}
 }
 
 void free_unbounded_int(unbounded_int *a) {
 	free_chiffre(a->premier);
+	a->premier = NULL;
+	a->dernier = NULL;
+	a->signe = '*';
+	a->len = 0;
 }
 
 unbounded_int copy_unbounded_int(unbounded_int *a) {
 	if(a == NULL) return NaN;
-	unbounded_int result = { .signe=a->signe, .len=a->len, .premier=NULL, .dernier=NULL };
+	unbounded_int result = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
 	for(chiffre *actual = a->premier; actual != NULL; actual = actual->suivant)
 		add_chiffre(&result, actual->c);
 	return result;
+}
+
+unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
+	if(isNaN(a) || isNaN(b)) return NaN;
+	if(isZERO(a) || isZERO(b)) return ZERO;
+	b = copy_unbounded_int(&b);
+	
+	unbounded_int result = copy_unbounded_int(&a);
+	result.signe = (a.signe != b.signe && (a.signe == '-' || b.signe == '-')) ? '-' : '+';
+	
+	unbounded_int one = string2unbounded_int("1"), minus_one = string2unbounded_int("-1"), tmp;
+	a.signe = result.signe;
+	b.signe = '+';
+	while(unbounded_int_cmp_unbounded_int(b, one) == 1) {
+		tmp = unbounded_int_somme(result, a);
+		free_unbounded_int(&result);
+		result = tmp;
+		
+		tmp = unbounded_int_somme(b, minus_one);
+		free_unbounded_int(&b);
+		b = tmp;
+	}
+	return strip(result);
 }
