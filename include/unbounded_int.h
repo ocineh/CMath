@@ -6,7 +6,7 @@
 #define NaN ((unbounded_int){ .signe='*', .len=0, .premier=NULL, .dernier=NULL })
 #define ZERO (ll2unbounded_int(0))
 #define isZERO(x) (x.len == 1 && x.premier->c == '0')
-#define isNaN(a) (a.signe == '*')
+#define isNaN(a) (a.signe == '*' || a.len == 0 || a.premier == NULL || a.dernier == NULL)
 
 typedef struct chiffre {
 	struct chiffre *suivant;

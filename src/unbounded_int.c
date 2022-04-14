@@ -116,7 +116,7 @@ static short ctoi(const char c) {
 	}
 }
 
-static short itoc(const short i) {
+static char itoc(const short i) {
 	switch(abs(i)) {
 		case 0: return '0';
 		case 1: return '1';
@@ -258,8 +258,8 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 
 unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	if(a.signe == '*' || b.signe == '*') return NaN;
-	if(isZERO(a)) return b;
-	if(isZERO(b)) return a;
+	if(isZERO(a)) return copy_unbounded_int(&b);
+	if(isZERO(b)) return copy_unbounded_int(&a);
 	
 	int cmp = cmp_abs(&a, &b);
 	if(a.signe != b.signe && cmp == 0) return ZERO;
@@ -305,25 +305,55 @@ unbounded_int copy_unbounded_int(unbounded_int *a) {
 	return result;
 }
 
+static void left_shift(unbounded_int *u, long long unsigned n) {
+	if(!isZERO((*u)))
+		while(n-- > 0)
+			add_chiffre(u, '0');
+}
+
+static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
+	if(a == NULL || isNaN((*a)) || c == NULL) return NaN;
+	if(c->c == '0' || isZERO((*a))) return ZERO;
+	if(c->c == '1') return copy_unbounded_int(a);
+	
+	const short coef = ctoi(c->c);
+	unbounded_int result = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
+	
+	chiffre *c_a = a->dernier;
+	short res, hold = 0;
+	while(c_a != NULL) {
+		res = ctoi(c_a->c) * coef + hold;
+		hold = res / 10;
+		add_begin(&result, res % 10);
+		c_a = c_a->precedent;
+	}
+	
+	if(hold != 0) add_begin(&result, hold);
+	return result;
+}
+
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	if(isNaN(a) || isNaN(b)) return NaN;
 	if(isZERO(a) || isZERO(b)) return ZERO;
 	b = copy_unbounded_int(&b);
 	
-	unbounded_int result = copy_unbounded_int(&a);
+	unbounded_int result = ZERO;
 	result.signe = (a.signe != b.signe && (a.signe == '-' || b.signe == '-')) ? '-' : '+';
 	
-	unbounded_int one = string2unbounded_int("1"), minus_one = string2unbounded_int("-1"), tmp;
-	a.signe = result.signe;
-	b.signe = '+';
-	while(unbounded_int_cmp_unbounded_int(b, one) == 1) {
-		tmp = unbounded_int_somme(result, a);
-		free_unbounded_int(&result);
-		result = tmp;
+	chiffre *c_b = b.dernier;
+	long long unsigned rand = 0;
+	while(c_b != NULL) {
+		unbounded_int inter = unbounded_int_fois_chiffre(&a, c_b);
+		inter.signe = result.signe;
+		left_shift(&inter, rand);
 		
-		tmp = unbounded_int_somme(b, minus_one);
-		free_unbounded_int(&b);
-		b = tmp;
+		unbounded_int tmp_bis = unbounded_int_somme(result, inter);
+		free_unbounded_int(&inter);
+		free_unbounded_int(&result);
+		result = tmp_bis;
+		
+		++rand;
+		c_b = c_b->precedent;
 	}
-	return strip(result);
+	return result;
 }
