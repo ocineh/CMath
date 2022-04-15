@@ -14,14 +14,14 @@
  * @param input the file with the instructions to execute
  * @param output The file to which the result is redirected
  */
-void interpret(FILE *input, FILE *output);
+extern void interpret(FILE *input, FILE *output);
 
 /**
  * Remove spaces at start and end of the string
  *
  * @param c a string
  */
-static void strip(char *c);
+extern void strip(char *c);
 
 /**
  * Split the elements of the string with the separator
@@ -30,7 +30,7 @@ static void strip(char *c);
  * @param separator a separator
  * @return an array of strings
  */
-static char **split(char *line, char separator);
+extern char **split(char *line, char separator);
 
 /**
  * Checks if the variable name is valid.
@@ -39,7 +39,7 @@ static char **split(char *line, char separator);
  * @param name the name of a variable
  * @return if the name is valid
  */
-static bool valid_variable_name(char *name);
+extern bool valid_variable_name(char *name);
 
 /**
  * Assign the value with the name of the variable.
@@ -49,7 +49,7 @@ static bool valid_variable_name(char *name);
  * @param u the value to assign
  * @return if the operation fails return NULL else a pointer
  */
-static unbounded_int *assign(char *name, unbounded_int *u);
+extern unbounded_int *assign(char *name, unbounded_int *u);
 
 /**
  * Get the value of a variable from its name.
@@ -57,7 +57,7 @@ static unbounded_int *assign(char *name, unbounded_int *u);
  * @param name the name of a variable
  * @return if the variable exists return its value else NULL
  */
-static unbounded_int *value_of(char *name);
+extern unbounded_int *value_of(char *name);
 
 /**
  * Evaluates a string and returns the result of the operations.
@@ -65,13 +65,13 @@ static unbounded_int *value_of(char *name);
  * @param line the operation to be evaluated
  * @return the result of the operation
  */
-static unbounded_int *eval(char *line);
+extern unbounded_int *eval(char *line);
 
 /**
  * Print the value of a variable.
  *
  * @param name the name of a variable
  */
-static void print(char *name, FILE *output);
+extern void print(char *name, FILE *output);
 
 #endif //PROJET_CALC_UNBOUNDED_INT_H
