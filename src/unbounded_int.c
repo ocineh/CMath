@@ -357,3 +357,16 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	}
 	return result;
 }
+
+unbounded_int unbounded_int_pow(unbounded_int u, unsigned long long n) {
+	if(n < 0) return NaN;
+	if(n == 0) return string2unbounded_int("1");
+	
+	unbounded_int result = copy_unbounded_int(&u);
+	while(n-- > 1) {
+		unbounded_int tmp = unbounded_int_produit(result, u);
+		free_unbounded_int(&result);
+		result = tmp;
+	}
+	return result;
+}

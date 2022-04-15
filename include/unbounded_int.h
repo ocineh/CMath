@@ -108,4 +108,13 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
 
 unbounded_int copy_unbounded_int(unbounded_int *a);
 
+/**
+ * The exponentiation of an unbounded_int by an unsigned number.
+ *
+ * @param u an instance of unbounded_int
+ * @param n the exponent
+ * @return the result of the exponentiation
+ */
+unbounded_int unbounded_int_pow(unbounded_int u, unsigned long long n);
+
 #endif //PROJET_UNBOUNDED_INT_H
