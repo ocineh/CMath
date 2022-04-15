@@ -4,19 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-struct chiffre {
-	struct chiffre *suivant;
-	char c;
-	struct chiffre *precedent;
-};
-
-struct unbounded_int {
-	char signe;
-	size_t len;
-	chiffre *premier;
-	chiffre *dernier;
-};
-
 void print_unbounded_int(unbounded_int *u) {
 	if(u->signe == '*') printf("NaN\n");
 	else {
@@ -296,7 +283,7 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
 
 static void free_chiffre(chiffre *c) {
 	if(c != NULL) {
-		if(c->suivant != NULL) free_chiffre(c->suivant);
+		free_chiffre(c->suivant);
 		free(c);
 		c = NULL;
 	}

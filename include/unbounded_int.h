@@ -8,10 +8,34 @@
 #define isZERO(x) (x.len == 1 && x.premier->c == '0')
 #define isNaN(a) (a.signe == '*' || a.len == 0 || a.premier == NULL || a.dernier == NULL)
 
-typedef struct chiffre chiffre;
+/**
+ * @brief a structure representing an digit.
+ * @details The node of a linked list of digits.
+ * @see unbounded_int
+ */
+typedef struct chiffre {
+	struct chiffre *suivant;
+	char c;
+	struct chiffre *precedent;
+} chiffre;
 
-typedef struct unbounded_int unbounded_int;
+/**
+ * @brief a structure representing an unbounded signed integer.
+ * @details The structure of an unbounded signed integer.
+ * @see chiffre
+ */
+typedef struct unbounded_int {
+	char signe;
+	size_t len;
+	chiffre *premier;
+	chiffre *dernier;
+} unbounded_int;
 
+/**
+ * Free the memory allocated for the unbounded_int.
+ *
+ * @param a an unbounded_int
+ */
 extern void free_unbounded_int(unbounded_int *a);
 
 /**
@@ -97,6 +121,12 @@ extern unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b);
  */
 extern unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b);
 
+/**
+ * Copy an unbounded_int.
+ *
+ * @param a an instance of unbounded_int
+ * @return a copy of a
+ */
 extern unbounded_int copy_unbounded_int(unbounded_int *a);
 
 /**
