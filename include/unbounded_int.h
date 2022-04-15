@@ -8,18 +8,9 @@
 #define isZERO(x) (x.len == 1 && x.premier->c == '0')
 #define isNaN(a) (a.signe == '*' || a.len == 0 || a.premier == NULL || a.dernier == NULL)
 
-typedef struct chiffre {
-	struct chiffre *suivant;
-	char c;
-	struct chiffre *precedent;
-} chiffre;
+typedef struct chiffre chiffre;
 
-typedef struct {
-	char signe;
-	size_t len;
-	chiffre *premier;
-	chiffre *dernier;
-} unbounded_int;
+typedef struct unbounded_int unbounded_int;
 
 void free_unbounded_int(unbounded_int *a);
 
