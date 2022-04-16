@@ -21,7 +21,7 @@ extern void interpret(FILE *input, FILE *output);
  *
  * @param c a string
  */
-extern void strip(char *c);
+extern char* strip(char *c);
 
 /**
  * Split the elements of the string with the separator
