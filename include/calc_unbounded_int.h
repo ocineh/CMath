@@ -30,7 +30,7 @@ extern char* strip(char *c);
  * @param separator a separator
  * @return an array of strings
  */
-extern char **split(char *line, char separator);
+extern size_t split(char *line, char separator, char ***tokens);
 
 /**
  * Checks if the variable name is valid.
