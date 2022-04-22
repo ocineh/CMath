@@ -34,7 +34,7 @@ extern size_t split(char *line, char separator, char ***tokens);
 
 /**
  * Checks if the variable name is valid.
- * The equivalent in regex is `[a-zA-Z_][a-zA-Z_à-9]*`
+ * The equivalent in regex is `[a-zA-Z_][a-zA-Z_0-9]*`
  *
  * @param name the name of a variable
  * @return if the name is valid

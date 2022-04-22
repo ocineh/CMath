@@ -41,3 +41,13 @@ size_t split(char *line, char separator, char ***tokens) {
 	}
 	return count;
 }
+
+bool valid_variable_name(char *name) {
+	if(name == NULL) return false;
+	size_t len = strlen(name);
+	if(len == 0) return false;
+	
+	if(!isalpha(name[0])) return false;
+	for(size_t i = 0; i < len; ++i) if(!isalnum(name[i]) && name[i] != '_') return false;
+	return true;
+}
