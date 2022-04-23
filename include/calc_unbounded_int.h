@@ -62,6 +62,7 @@ extern bool is_assigned(memory *mem, char *name);
  * Assign the value with the name of the variable.
  * If the name is already used or the variable name is not valid the operation will fail.
  *
+ * @param mem the memory where the variable is stored
  * @param name the name of the variable
  * @param u the value to assign
  * @return if the operation fails return NULL else a pointer
@@ -71,6 +72,7 @@ extern unbounded_int *assign(memory *mem, char *name, unbounded_int u);
 /**
  * Get the value of a variable from its name.
  *
+ * @param mem the memory where the variable is stored
  * @param name the name of a variable
  * @return if the variable exists return its value else NULL
  */
