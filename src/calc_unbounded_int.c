@@ -144,3 +144,12 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	}
 	return NULL;
 }
+
+unbounded_int *value_of(memory *mem, char *name) {
+	node *curr = mem->head;
+	while(curr != NULL) {
+		if(strcmp(curr->name, name) == 0) return &curr->value;
+		curr = curr->next;
+	}
+	return NULL;
+}

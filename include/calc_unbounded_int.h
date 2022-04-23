@@ -74,7 +74,7 @@ extern unbounded_int *assign(memory *mem, char *name, unbounded_int u);
  * @param name the name of a variable
  * @return if the variable exists return its value else NULL
  */
-extern unbounded_int *value_of(char *name);
+extern unbounded_int *value_of(memory *mem, char *name);
 
 /**
  * Evaluates a string and returns the result of the operations.
