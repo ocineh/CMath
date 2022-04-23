@@ -2,6 +2,75 @@
 #include <stdlib.h>
 #include <ctype.h>
 
+typedef struct node {
+	char *name;
+	unbounded_int value;
+	struct node *next;
+	struct node *prev;
+} node;
+
+typedef struct memory {
+	size_t size;
+	node *head;
+	node *tail;
+} memory;
+
+typedef struct interpreter {
+	memory *memory;
+	FILE *input;
+	FILE *output;
+} interpreter;
+
+static node* create_node(char *name, unbounded_int value) {
+	node *n = malloc(sizeof(node));
+	n->name = name;
+	n->value = value;
+	n->next = n->prev = NULL;
+	return n;
+}
+
+static memory *create_memory() {
+	memory *mem = malloc(sizeof(memory));
+	mem->size = 0;
+	mem->head = mem->tail = NULL;
+	return mem;
+}
+
+interpreter *create_interpreter(FILE *input, FILE *output) {
+	if(input == NULL) input = stdin;
+	if(output == NULL) output = stdout;
+	
+	interpreter *interp = malloc(sizeof(interpreter));
+	interp->input = input;
+	interp->output = output;
+	interp->memory = create_memory();
+	return interp;
+}
+
+static void destroy_node(node *n) {
+	free(n->name);
+	free_unbounded_int(&n->value);
+	free(n);
+}
+
+static void destroy_memory(memory *mem) {
+	node *curr = mem->head;
+	while(curr != NULL) {
+		node *next = curr->next;
+		destroy_node(curr);
+		curr = next;
+	}
+	free(mem);
+}
+
+void destroy_interpreter(interpreter *interpreter) {
+	if(interpreter == NULL) return;
+	destroy_memory(interpreter->memory);
+	fclose(interpreter->input);
+	fclose(interpreter->output);
+	free(interpreter);
+}
+
 char *strip(char *c) {
 	size_t begin = 0;
 	while(isspace(c[begin])) begin++;

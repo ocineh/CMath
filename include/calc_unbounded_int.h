@@ -6,6 +6,14 @@
 #include <stdbool.h>
 #include "unbounded_int.h"
 
+typedef struct memory memory;
+
+typedef struct interpreter interpreter;
+
+extern interpreter *create_interpreter(FILE *input, FILE *output);
+
+extern void destroy_interpreter(interpreter *interpreter);
+
 /**
  * Interprets instructions from one file and writes the result to another file.
  * If the input file is NULL then stdin is used.
@@ -14,14 +22,14 @@
  * @param input the file with the instructions to execute
  * @param output The file to which the result is redirected
  */
-extern void interpret(FILE *input, FILE *output);
+extern void interpret(interpreter *interpreter);
 
 /**
  * Remove spaces at start and end of the string
  *
  * @param c a string
  */
-extern char* strip(char *c);
+extern char *strip(char *c);
 
 /**
  * Split the elements of the string with the separator
