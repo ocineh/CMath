@@ -50,6 +50,15 @@ extern size_t split(char *line, char separator, char ***tokens);
 extern bool valid_variable_name(char *name);
 
 /**
+ * Checks if the variable is already defined.
+ *
+ * @param mem the memory where the variable is stored
+ * @param name the name of the variable
+ * @return
+ */
+extern bool is_assigned(memory *mem, char *name);
+
+/**
  * Assign the value with the name of the variable.
  * If the name is already used or the variable name is not valid the operation will fail.
  *
@@ -57,7 +66,7 @@ extern bool valid_variable_name(char *name);
  * @param u the value to assign
  * @return if the operation fails return NULL else a pointer
  */
-extern unbounded_int *assign(char *name, unbounded_int *u);
+extern unbounded_int *assign(memory *mem, char *name, unbounded_int u);
 
 /**
  * Get the value of a variable from its name.

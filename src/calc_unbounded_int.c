@@ -21,7 +21,7 @@ typedef struct interpreter {
 	FILE *output;
 } interpreter;
 
-static node* create_node(char *name, unbounded_int value) {
+static node *create_node(char *name, unbounded_int value) {
 	node *n = malloc(sizeof(node));
 	n->name = name;
 	n->value = value;
@@ -119,4 +119,28 @@ bool valid_variable_name(char *name) {
 	if(!isalpha(name[0])) return false;
 	for(size_t i = 0; i < len; ++i) if(!isalnum(name[i]) && name[i] != '_') return false;
 	return true;
+}
+
+bool is_assigned(memory *mem, char *name) {
+	node *curr = mem->head;
+	while(curr != NULL) {
+		if(strcmp(curr->name, name) == 0) return true;
+		curr = curr->next;
+	}
+	return false;
+}
+
+unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
+	if(!valid_variable_name(name)) return NULL;
+	if(is_assigned(mem, name)) return NULL;
+	
+	node *n = create_node(name, u);
+	if(mem->head == NULL)
+		mem->head = mem->tail = n;
+	else {
+		mem->tail->next = n;
+		n->prev = mem->tail;
+		mem->tail = n;
+	}
+	return NULL;
 }
