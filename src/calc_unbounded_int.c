@@ -153,3 +153,9 @@ unbounded_int *value_of(memory *mem, char *name) {
 	}
 	return NULL;
 }
+
+void print(interpreter *interpreter, char *name) {
+	unbounded_int *u = value_of(interpreter->memory, name);
+	if(u == NULL) fprintf(interpreter->output, "Variable %s not found.\n", name);
+	else fprintf(interpreter->output, "%s = %s\n", name, unbounded_int2string(*u));
+}

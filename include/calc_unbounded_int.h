@@ -89,8 +89,9 @@ extern unbounded_int *eval(char *line);
 /**
  * Print the value of a variable.
  *
+ * @param interpreter the interpreter
  * @param name the name of a variable
  */
-extern void print(char *name, FILE *output);
+extern void print(interpreter *interpreter, char *name);
 
 #endif //PROJET_CALC_UNBOUNDED_INT_H
