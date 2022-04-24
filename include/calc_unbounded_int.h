@@ -25,22 +25,6 @@ extern void destroy_interpreter(interpreter *interpreter);
 extern void interpret(interpreter *interpreter);
 
 /**
- * Remove spaces at start and end of the string
- *
- * @param c a string
- */
-extern char *strip(char *c);
-
-/**
- * Split the elements of the string with the separator
- *
- * @param line a string
- * @param separator a separator
- * @return an array of strings
- */
-extern size_t split(char *line, char separator, char ***tokens);
-
-/**
  * Checks if the variable name is valid.
  * The equivalent in regex is `[a-zA-Z_][a-zA-Z_0-9]*`
  *
