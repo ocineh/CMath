@@ -50,3 +50,11 @@ size_t index_of(const char *s, char c) {
 		if(s[i] == c) return i;
 	return -1;
 }
+
+char *substring(const char *s, size_t begin, size_t end) {
+	size_t len = strlen(s);
+	if(begin >= end || begin >= len || end >= len) return "";
+	char *new = malloc(end - begin + 1);
+	memmove(new, s + begin, end - begin + 1);
+	return new;
+}

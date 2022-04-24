@@ -31,4 +31,14 @@ extern size_t split(char *line, char separator, char ***tokens);
  */
 size_t index_of(const char *s, char c);
 
+/**
+ * Get the substring from the string
+ *
+ * @param s a string
+ * @param begin the beginning of the substring
+ * @param end the end of the substring
+ * @return the substring
+ */
+char *substring(const char *s, size_t begin, size_t end);
+
 #endif //PROJET_STRINGS_H
