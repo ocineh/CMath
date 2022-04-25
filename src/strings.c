@@ -17,9 +17,9 @@ char *strip(char *c) {
 	size_t end = strlen(c) - 1;
 	while(end > 0 && isspace(c[end])) end--;
 	
-	if(begin >= end) return "";
+	if(begin > end) return "";
 	size_t len = end - begin + 1;
-	char *new = malloc(len);
+	char *new = malloc(len + 1);
 	memmove(new, c + begin, len);
 	return new;
 }
