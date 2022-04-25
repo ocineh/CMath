@@ -50,16 +50,15 @@ size_t split(char *line, char separator, char ***tokens) {
 	return count;
 }
 
-size_t index_of(const char *s, char c) {
+int index_of(const char *s, char c) {
 	size_t len = strlen(s);
-	for(size_t i = 0; i < len; ++i)
+	for(int i = 0; i < len; ++i)
 		if(s[i] == c) return i;
 	return -1;
 }
 
 char *substring(const char *s, size_t begin, size_t end) {
 	size_t len = strlen(s);
-	if(begin >= end || begin >= len || end >= len) return "";
 	char *new = malloc(end - begin + 1);
 	memmove(new, s + begin, end - begin + 1);
 	return new;

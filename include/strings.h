@@ -35,7 +35,7 @@ extern size_t split(char *line, char separator, char ***tokens);
  * @param c a character
  * @return an index in the string or -1 if not found
  */
-size_t index_of(const char *s, char c);
+int index_of(const char *s, char c);
 
 /**
  * Get the substring from the string
