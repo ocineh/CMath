@@ -47,4 +47,12 @@ size_t index_of(const char *s, char c);
  */
 char *substring(const char *s, size_t begin, size_t end);
 
+/**
+ * Returns if the string is a number
+ *
+ * @param s a string
+ * @return true if the string is a number
+ */
+bool is_number(const char *s);
+
 #endif //PROJET_STRINGS_H

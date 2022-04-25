@@ -64,3 +64,17 @@ char *substring(const char *s, size_t begin, size_t end) {
 	memmove(new, s + begin, end - begin + 1);
 	return new;
 }
+
+bool is_number(const char *s) {
+	size_t len = strlen(s);
+	if(len == 0) return false;
+	if(s[0] == '-' || s[0] == '+') {
+		if(len == 1) return false;
+		++s;
+		--len;
+	}
+	while(len-- > 0)
+		if(!isdigit(*(s++)))
+			return false;
+	return true;
+}
