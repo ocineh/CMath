@@ -1,10 +1,16 @@
 #ifndef PROJET_STRINGS_H
 #define PROJET_STRINGS_H
 
-#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "unbounded_int.h"
+
+/**
+ * Returns the length of the string.
+ *
+ * @param s a string
+ * @return the length of the string
+ */
+extern size_t strlen(const char *s);
 
 /**
  * Remove spaces at start and end of the string

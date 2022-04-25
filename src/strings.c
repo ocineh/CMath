@@ -1,8 +1,14 @@
 #include <ctype.h>
 #include <stdlib.h>
-#include <calc_unbounded_int.h>
+#include <memory.h>
 #include "strings.h"
 
+size_t strlen(const char *s) {
+	size_t len = 0;
+	while((*s++) != '\0')
+		len++;
+	return len;
+}
 
 char *strip(char *c) {
 	size_t begin = 0;
