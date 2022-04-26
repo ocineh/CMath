@@ -62,6 +62,7 @@ char *substring(const char *s, size_t begin, size_t end) {
 	size_t len = strlen(s);
 	char *new = malloc(end - begin + 1);
 	memmove(new, s + begin, end - begin + 1);
+	new[end - begin] = '\0';
 	return new;
 }
 
@@ -80,9 +81,8 @@ bool is_number(const char *s) {
 }
 
 int last_index_of(const char *s, char c) {
-	size_t len = strlen(s) - 1;
-	for(size_t i = len; i >= 0; --i)
-		if(s[i] == c) return (int) i;
+	for(int i = (int) strlen(s) - 1; i >= 0; --i)
+		if(s[i] == c) return i;
 	return -1;
 }
 
