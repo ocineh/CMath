@@ -67,4 +67,12 @@ bool is_number(const char *s);
 char *__concat__(char *s, ...);
 #define concat(...) __concat__(__VA_ARGS__, NULL)
 
+/**
+ * Returns if the character is a digit or an arithmetic operator.
+ *
+ * @param c a character
+ * @return if the character is a digit or an arithmetic operator
+ */
+bool is_arithmetic(char c);
+
 #endif //PROJET_STRINGS_H

@@ -108,3 +108,9 @@ char *__concat__(char *s, ...) {
 	return new;
 }
 
+bool is_arithmetic(char c) {
+	if(isdigit(c)) return true;
+	if(c == '+' || c == '-' || c == '*') return true;
+	return c == ' ';
+}
+
