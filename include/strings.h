@@ -38,6 +38,15 @@ extern size_t split(char *line, char separator, char ***tokens);
 int index_of(const char *s, char c);
 
 /**
+ * Get the index of the last occurrence of the character in the string
+ *
+ * @param s a string
+ * @param c a character
+ * @return an index in the string or -1 if not found
+ */
+int last_index_of(const char *s, char c);
+
+/**
  * Get the substring from the string
  *
  * @param s a string

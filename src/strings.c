@@ -77,3 +77,10 @@ bool is_number(const char *s) {
 			return false;
 	return true;
 }
+
+int last_index_of(const char *s, char c) {
+	size_t len = strlen(s) - 1;
+	for(size_t i = len; i >= 0; --i)
+		if(s[i] == c) return (int) i;
+	return -1;
+}
