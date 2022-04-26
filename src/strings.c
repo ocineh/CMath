@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <stdarg.h>
 #include "strings.h"
 
 size_t strlen(const char *s) {
@@ -84,3 +85,26 @@ int last_index_of(const char *s, char c) {
 		if(s[i] == c) return (int) i;
 	return -1;
 }
+
+char *__concat__(char *s, ...) {
+	va_list args;
+	va_start(args, s);
+	size_t len = strlen(s);
+	char *tmp;
+	while((tmp = va_arg(args, char *)) != NULL)
+		len += strlen(tmp);
+	va_end(args);
+	
+	va_start(args, s);
+	char *new = malloc(len + 1);
+	memmove(new, s, strlen(s) + 1);
+	size_t j = strlen(s);
+	while((tmp = va_arg(args, char *)) != NULL) {
+		size_t l = strlen(tmp);
+		memmove(new + j, tmp, l + 1);
+		j += l;
+	}
+	va_end(args);
+	return new;
+}
+

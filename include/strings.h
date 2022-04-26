@@ -64,4 +64,7 @@ char *substring(const char *s, size_t begin, size_t end);
  */
 bool is_number(const char *s);
 
+char *__concat__(char *s, ...);
+#define concat(...) __concat__(__VA_ARGS__, NULL)
+
 #endif //PROJET_STRINGS_H
