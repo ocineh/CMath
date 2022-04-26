@@ -103,7 +103,7 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 		n->prev = mem->tail;
 		mem->tail = n;
 	}
-	return NULL;
+	return &n->value;
 }
 
 unbounded_int *value_of(memory *mem, char *name) {
