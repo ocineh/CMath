@@ -75,4 +75,12 @@ char *__concat__(char *s, ...);
  */
 bool is_arithmetic(char c);
 
+/**
+ * Return if a string is a valid arithmetic expression.
+ *
+ * @param s a string
+ * @return if the string is a valid arithmetic expression
+ */
+bool is_arithmetic_expression(const char *s);
+
 #endif //PROJET_STRINGS_H

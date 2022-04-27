@@ -114,3 +114,11 @@ bool is_arithmetic(char c) {
 	return c == ' ';
 }
 
+bool is_arithmetic_expression(const char *s) {
+	size_t len = strlen(s);
+	if(len == 0) return false;
+	for(size_t i = 0; i < len; ++i)
+		if(!is_arithmetic(s[i]))
+			return false;
+	return true;
+}
