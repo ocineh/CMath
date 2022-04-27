@@ -22,6 +22,7 @@ char *strip(char *c) {
 	size_t len = end - begin + 1;
 	char *new = malloc(len + 1);
 	memmove(new, c + begin, len);
+	new[len] = '\0';
 	return new;
 }
 
