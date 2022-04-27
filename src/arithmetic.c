@@ -74,10 +74,11 @@ static node *string_to_node(char *str) {
 	node *left_node = string_to_node(left);
 	node *right_node = string_to_node(right);
 	
+	operator op = char_to_operator(str[pos]);
 	free(str);
 	free(left);
 	free(right);
-	return operator_to_node(char_to_operator(str[pos]), left_node, right_node);
+	return operator_to_node(op, left_node, right_node);
 }
 
 tree *string_to_tree(char *str) {
@@ -89,4 +90,30 @@ tree *string_to_tree(char *str) {
 	tree *t = malloc(sizeof(tree));
 	t->root = string_to_node(str);
 	return t;
+}
+
+static char *operator_to_char(operator op) {
+	switch(op) {
+		case ADD: return "+";
+		case SUB: return "-";
+		case MUL: return "*";
+		default: return "\0";
+	}
+}
+
+static char *node_to_string(node *n) {
+	if(n == NULL) return NULL;
+	if(n->operator == NONE)
+		return concat("(", unbounded_int2string(n->operand), ")");
+	
+	char *left = node_to_string(n->left);
+	char *right = node_to_string(n->right);
+	char *res = concat(left, " ", operator_to_char(n->operator), " ", right);
+	free(left);
+	free(right);
+	return res;
+}
+
+char *tree_to_string(tree *t) {
+	return node_to_string(t->root);
 }

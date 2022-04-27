@@ -24,6 +24,8 @@ tree *string_to_tree(char *str);
 
 void evaluate(tree *t);
 
+char *tree_to_string(tree *t);
+
 void free_node(node *n);
 void free_tree(tree *t);
 
