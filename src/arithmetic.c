@@ -14,7 +14,9 @@ struct tree {
 };
 
 node *operator_to_node(operator op, node *left, node *right) {
+	if(left == NULL || right == NULL) return NULL;
 	node *n = malloc(sizeof(node));
+	if(n == NULL) return NULL;
 	n->operator = op;
 	n->left = left;
 	n->right = right;
@@ -22,7 +24,9 @@ node *operator_to_node(operator op, node *left, node *right) {
 }
 
 node *value_to_node(unbounded_int value) {
+	if(isNaN(value)) return NULL;
 	node *n = malloc(sizeof(node));
+	if(n == NULL) return NULL;
 	n->operator = NONE;
 	n->operand = value;
 	n->left = n->right = NULL;
@@ -38,8 +42,10 @@ void free_node(node *n) {
 }
 
 void free_tree(tree *t) {
-	free_node(t->root);
-	free(t);
+	if(t != NULL) {
+		if(t->root != NULL) free_node(t->root);
+		free(t);
+	}
 }
 
 static char *strip_free(char *s) {
@@ -65,21 +71,33 @@ static node *string_to_node(char *str) {
 	if(pos == -1) pos = index_of(str, '-');
 	if(pos == -1) pos = index_of(str, '*');
 	
-	if(pos == -1) {
-		unbounded_int value = string2unbounded_int(str);
+	if(pos <= 0) {
+		char *tmp = str;
+		++tmp;
+		while(is_digit(*tmp)) ++tmp;
+		
+		int tmp_pos = index_of(tmp, '+');
+		if(tmp_pos == -1) tmp_pos = index_of(tmp, '-');
+		if(tmp_pos == -1) tmp_pos = index_of(tmp, '*');
+		
+		if(tmp_pos == -1) {
+			unbounded_int value = string2unbounded_int(str);
+			free(str);
+			return value_to_node(value);
+		}
+		
+		char *n = substring(str, 0, (tmp - str) + tmp_pos);
+		unbounded_int value = string2unbounded_int(n);
+		node *left = value_to_node(value);
+		operator op = char_to_operator(tmp[tmp_pos]);
+		node *node = operator_to_node(op, left, string_to_node(tmp + tmp_pos + 1));
+		free(n);
 		free(str);
-		return value_to_node(value);
+		return node;
 	}
 	
 	char *left = strip_free(substring(str, 0, pos));
 	char *right = strip_free(substring(str, pos + 1, len));
-	if(strlen(left) == 0) {
-		free(left);
-		free(str);
-		unbounded_int value = string2unbounded_int(right);
-		free(right);
-		return value_to_node(value);
-	}
 	
 	node *left_node = string_to_node(left);
 	node *right_node = string_to_node(right);
@@ -98,7 +116,12 @@ tree *string_to_tree(char *str) {
 	if(len == 0) return NULL;
 	
 	tree *t = malloc(sizeof(tree));
+	if(t == NULL) return NULL;
 	t->root = string_to_node(str);
+	if(t->root == NULL) {
+		free(t);
+		return NULL;
+	}
 	return t;
 }
 
@@ -125,6 +148,7 @@ static char *node_to_string(node *n) {
 }
 
 char *tree_to_string(tree *t) {
+	if(t == NULL) return "NULL";
 	return node_to_string(t->root);
 }
 

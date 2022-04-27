@@ -83,4 +83,6 @@ bool is_arithmetic(char c);
  */
 bool is_arithmetic_expression(const char *s);
 
+bool is_digit(char c);
+
 #endif //PROJET_STRINGS_H
