@@ -14,7 +14,6 @@ typedef struct node {
 
 typedef struct tree {
 	node *root;
-	unbounded_int *result;
 } tree;
 
 node *operator_to_node(operator op, node *left, node *right);

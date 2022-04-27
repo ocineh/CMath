@@ -28,7 +28,6 @@ void free_node(node *n) {
 
 void free_tree(tree *t) {
 	free_node(t->root);
-	if(t->result != NULL) free_unbounded_int(t->result);
 	free(t);
 }
 
@@ -116,4 +115,46 @@ static char *node_to_string(node *n) {
 
 char *tree_to_string(tree *t) {
 	return node_to_string(t->root);
+}
+
+static node *evaluate_mul_node(node *n) {
+	if(n == NULL) return NULL;
+	
+	n->left = evaluate_mul_node(n->left);
+	n->right = evaluate_mul_node(n->right);
+	
+	if(n->operator == MUL) {
+		unbounded_int res = unbounded_int_produit(n->left->operand, n->right->operand);
+		free_node(n);
+		return value_to_node(res);
+	}
+	return n;
+}
+
+static node *evaluate_add_and_sub_node(node *n) {
+	if(n == NULL) return NULL;
+	if(n->operator == NONE) return n;
+	
+	n->left = evaluate_add_and_sub_node(n->left);
+	n->right = evaluate_add_and_sub_node(n->right);
+	
+	if(n->operator == ADD) {
+		unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
+		free_node(n);
+		return value_to_node(res);
+	}
+	if(n->operator == SUB) {
+		n->right->operand.signe = (n->right->operand.signe == '+') ? '-' : '+';
+		unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
+		free_node(n);
+		return value_to_node(res);
+	}
+	return n;
+}
+
+void evaluate(tree *t) {
+	if(t != NULL && t->root != NULL) {
+		t->root = evaluate_mul_node(t->root);
+		t->root = evaluate_add_and_sub_node(t->root);
+	}
 }
