@@ -16,3 +16,17 @@ node *value_to_node(unbounded_int value) {
 	n->left = n->right = NULL;
 	return n;
 }
+
+void free_node(node *n) {
+	if(n == NULL) return;
+	free_unbounded_int(&n->operand);
+	free_node(n->left);
+	free_node(n->right);
+	free(n);
+}
+
+void free_tree(tree *t) {
+	free_node(t->root);
+	free_unbounded_int(t->result);
+	free(t);
+}
