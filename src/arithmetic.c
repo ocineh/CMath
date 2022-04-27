@@ -2,6 +2,17 @@
 #include "arithmetic.h"
 #include "strings.h"
 
+struct node {
+	operator operator;
+	unbounded_int operand;
+	struct node *left;
+	struct node *right;
+};
+
+struct tree {
+	node *root;
+};
+
 node *operator_to_node(operator op, node *left, node *right) {
 	node *n = malloc(sizeof(node));
 	n->operator = op;

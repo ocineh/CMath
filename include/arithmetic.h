@@ -5,16 +5,9 @@
 
 typedef enum operator { ADD, SUB, MUL, NONE } operator;
 
-typedef struct node {
-	operator operator;
-	unbounded_int operand;
-	struct node *left;
-	struct node *right;
-} node;
+typedef struct node node;
 
-typedef struct tree {
-	node *root;
-} tree;
+typedef struct tree tree;
 
 node *operator_to_node(operator op, node *left, node *right);
 node *value_to_node(unbounded_int value);
