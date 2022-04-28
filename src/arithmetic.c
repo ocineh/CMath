@@ -2,7 +2,11 @@
 #include "arithmetic.h"
 #include "strings.h"
 
-struct node {
+typedef enum operator {
+	ADD, SUB, MUL, NONE
+} operator;
+
+typedef struct node {
 	operator operator;
 	union {
 		unbounded_int operand;
@@ -11,13 +15,13 @@ struct node {
 			struct node *right;
 		};
 	};
-};
+} node;
 
 struct tree {
 	node *root;
 };
 
-node *operator_to_node(operator op, node *left, node *right) {
+static node *operator_to_node(operator op, node *left, node *right) {
 	if(left == NULL || right == NULL) return NULL;
 	node *n = malloc(sizeof(node));
 	if(n == NULL) return NULL;
@@ -27,7 +31,7 @@ node *operator_to_node(operator op, node *left, node *right) {
 	return n;
 }
 
-node *value_to_node(unbounded_int value) {
+static node *value_to_node(unbounded_int value) {
 	if(isNaN(value)) return NULL;
 	node *n = malloc(sizeof(node));
 	if(n == NULL) return NULL;
@@ -36,7 +40,7 @@ node *value_to_node(unbounded_int value) {
 	return n;
 }
 
-void free_node(node *n) {
+static void free_node(node *n) {
 	if(n == NULL) return;
 	if(n->operator == NONE)
 		free_unbounded_int(&n->operand);
