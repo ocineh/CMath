@@ -165,8 +165,10 @@ char *tree_to_string(tree *t) {
 static node *evaluate_mul_node(node *n) {
 	if(n == NULL) return NULL;
 
-	n->left = evaluate_mul_node(n->left);
-	n->right = evaluate_mul_node(n->right);
+	if(n->operator != NONE) {
+		n->left = evaluate_mul_node(n->left);
+		n->right = evaluate_mul_node(n->right);
+	}
 
 	if(n->operator == MUL) {
 		unbounded_int res = unbounded_int_produit(n->left->operand, n->right->operand);
