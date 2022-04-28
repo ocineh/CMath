@@ -3,7 +3,9 @@
 
 #include "unbounded_int.h"
 
-typedef enum operator { ADD, SUB, MUL, NONE } operator;
+typedef enum operator {
+	ADD, SUB, MUL, NONE
+} operator;
 
 /**
  * Represents an operator with two children or a number without children.
@@ -68,5 +70,21 @@ void free_node(node *n);
  * @param t a tree
  */
 void free_tree(tree *t);
+
+/**
+ * Calculate the number of nodes in a tree.
+ *
+ * @param t a tree
+ * @return the number of nodes
+ */
+size_t tree_size(tree *t);
+
+/**
+ * Calculate the depth of a tree.
+ *
+ * @param t a tree
+ * @return the depth of the tree
+ */
+size_t tree_depth(tree *t);
 
 #endif //PROJET_ARITHMETIC_H

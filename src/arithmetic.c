@@ -207,3 +207,27 @@ void evaluate(tree *t) {
 		t->root = evaluate_add_and_sub_node(t->root);
 	}
 }
+
+static size_t node_size(node *n) {
+	if(n == NULL) return 0;
+	if(n->operator == NONE) return 1;
+	return 1 + node_size(n->left) + node_size(n->right);
+}
+
+size_t tree_size(tree *t) {
+	if(t == NULL) return 0;
+	return node_size(t->root);
+}
+
+static size_t node_depth(node *n) {
+	if(n == NULL) return 0;
+	if(n->operator == NONE) return 1;
+	size_t left = node_depth(n->left);
+	size_t right = node_depth(n->right);
+	return 1 + ((left > right) ? left : right);
+}
+
+size_t tree_depth(tree *t) {
+	if(t == NULL) return 0;
+	return node_depth(t->root);
+}
