@@ -15,7 +15,7 @@ typedef struct tree tree;
  * @param str a string representing an arithmetic expression
  * @return a new tree or NULL if it failed
  */
-tree *string_to_tree(char *str);
+extern tree *string_to_tree(char *str);
 
 /**
  * Transform a tree into an arithmetic expression.
@@ -23,21 +23,21 @@ tree *string_to_tree(char *str);
  * @param t a tree
  * @return a string
  */
-char *tree_to_string(tree *t);
+extern char *tree_to_string(tree *t);
 
 /**
  * Evaluate all the nodes of a tree until it remains only one with a value.
  *
  * @param t a tree
  */
-void evaluate(tree *t);
+extern void evaluate(tree *t);
 
 /**
  * Free a tree and all its nodes recursively.
  *
  * @param t a tree
  */
-void free_tree(tree *t);
+extern void free_tree(tree *t);
 
 /**
  * Calculate the number of nodes in a tree.
@@ -45,7 +45,7 @@ void free_tree(tree *t);
  * @param t a tree
  * @return the number of nodes
  */
-size_t tree_size(tree *t);
+extern size_t tree_size(tree *t);
 
 /**
  * Calculate the depth of a tree.
@@ -53,6 +53,6 @@ size_t tree_size(tree *t);
  * @param t a tree
  * @return the depth of the tree
  */
-size_t tree_depth(tree *t);
+extern size_t tree_depth(tree *t);
 
 #endif //PROJET_ARITHMETIC_H

@@ -35,7 +35,7 @@ extern size_t split(char *line, char separator, char ***tokens);
  * @param c a character
  * @return an index in the string or -1 if not found
  */
-int index_of(const char *s, char c);
+extern int index_of(const char *s, char c);
 
 /**
  * Get the index of the last occurrence of the character in the string
@@ -44,7 +44,7 @@ int index_of(const char *s, char c);
  * @param c a character
  * @return an index in the string or -1 if not found
  */
-int last_index_of(const char *s, char c);
+extern int last_index_of(const char *s, char c);
 
 /**
  * Get the substring from the string
@@ -54,7 +54,7 @@ int last_index_of(const char *s, char c);
  * @param end the end of the substring
  * @return the substring
  */
-char *substring(const char *s, size_t begin, size_t end);
+extern char *substring(const char *s, size_t begin, size_t end);
 
 /**
  * Returns if the string is a number
@@ -62,9 +62,9 @@ char *substring(const char *s, size_t begin, size_t end);
  * @param s a string
  * @return true if the string is a number
  */
-bool is_number(const char *s);
+extern bool is_number(const char *s);
 
-char *__concat__(char *s, ...);
+extern char *__concat__(char *s, ...);
 #define concat(...) __concat__(__VA_ARGS__, NULL)
 
 /**
@@ -73,7 +73,7 @@ char *__concat__(char *s, ...);
  * @param c a character
  * @return if the character is a digit or an arithmetic operator
  */
-bool is_arithmetic(char c);
+extern bool is_arithmetic(char c);
 
 /**
  * Return if a string is a valid arithmetic expression.
@@ -81,8 +81,8 @@ bool is_arithmetic(char c);
  * @param s a string
  * @return if the string is a valid arithmetic expression
  */
-bool is_arithmetic_expression(const char *s);
+extern bool is_arithmetic_expression(const char *s);
 
-bool is_digit(char c);
+extern bool is_digit(char c);
 
 #endif //PROJET_STRINGS_H
