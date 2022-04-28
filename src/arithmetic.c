@@ -168,6 +168,55 @@ char *tree_to_string(tree *t) {
 	return node_to_string(t->root);
 }
 
+static node *simplify(node *n) {
+	if(n == NULL) return NULL;
+	if(n->operator == NONE) return n;
+
+	n->left = simplify(n->left);
+	n->right = simplify(n->right);
+
+	if(n->operator == ADD) {
+		if(n->left->operator == NONE && isZERO(n->left->operand)) {
+			free_node(n->left);
+			return n->right;
+		}
+		if(n->right->operator == NONE && isZERO(n->right->operand)) {
+			free_node(n->right);
+			return n->left;
+		}
+	} else if(n->operator == SUB) {
+		if(n->right->operator == NONE && isZERO(n->right->operand)) {
+			free_node(n->right);
+			return n->left;
+		}
+		if(n->left->operator == NONE && isZERO(n->left->operand)) {
+			free_node(n->left);
+			n->right->operand.signe == (n->right->operand.signe == '-') ? '+' : '-';
+			return n->right;
+		}
+	} else if(n->operator == MUL){
+		if(n->left->operator == NONE && isONE(n->left->operand)) {
+			free_node(n->left);
+			return n->right;
+		}
+		if(n->right->operator == NONE && isONE(n->right->operand)) {
+			free_node(n->right);
+			return n->left;
+		}
+		if(n->left->operator == NONE && isZERO(n->left->operand)) {
+			free_node(n->left);
+			free_node(n->right);
+			return value_to_node(ZERO);
+		}
+		if(n->right->operator == NONE && isZERO(n->right->operand)) {
+			free_node(n->right);
+			free_node(n->left);
+			return value_to_node(ZERO);
+		}
+	}
+	return n;
+}
+
 static node *evaluate_mul_node(node *n) {
 	if(n == NULL) return NULL;
 
@@ -207,6 +256,7 @@ static node *evaluate_add_and_sub_node(node *n) {
 
 void evaluate(tree *t) {
 	if(t != NULL && t->root != NULL) {
+		t->root = simplify(t->root);
 		t->root = evaluate_mul_node(t->root);
 		t->root = evaluate_add_and_sub_node(t->root);
 	}
