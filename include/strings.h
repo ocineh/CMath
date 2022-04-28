@@ -85,4 +85,6 @@ extern bool is_arithmetic_expression(const char *s);
 
 extern bool is_digit(char c);
 
+extern char *remove_spaces(char *s);
+
 #endif //PROJET_STRINGS_H
