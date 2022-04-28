@@ -14,10 +14,10 @@ size_t strlen(const char *s) {
 char *strip(char *c) {
 	size_t begin = 0;
 	while(isspace(c[begin])) begin++;
-	
+
 	size_t end = strlen(c) - 1;
 	while(end > 0 && isspace(c[end])) end--;
-	
+
 	if(begin > end) return "";
 	size_t len = end - begin + 1;
 	char *new = malloc(len + 1);
@@ -43,7 +43,7 @@ size_t split(char *line, char separator, char ***tokens) {
 			i = j - 1;
 		}
 	}
-	
+
 	*tokens = malloc(sizeof(char *) * count);
 	for(size_t i = 0, j = i, k = 0; i < len && k < count; i = j + 1, j = i) {
 		while(line[j] != separator && j < len) j++;
@@ -95,7 +95,7 @@ char *__concat__(char *s, ...) {
 	while((tmp = va_arg(args, char *)) != NULL)
 		len += strlen(tmp);
 	va_end(args);
-	
+
 	va_start(args, s);
 	char *new = malloc(len + 1);
 	memmove(new, s, strlen(s) + 1);

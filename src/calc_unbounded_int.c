@@ -40,7 +40,7 @@ static memory *create_memory() {
 interpreter *create_interpreter(FILE *input, FILE *output) {
 	if(input == NULL) input = stdin;
 	if(output == NULL) output = stdout;
-	
+
 	interpreter *interp = malloc(sizeof(interpreter));
 	interp->input = input;
 	interp->output = output;
@@ -76,7 +76,7 @@ bool valid_variable_name(char *name) {
 	if(name == NULL) return false;
 	size_t len = strlen(name);
 	if(len == 0) return false;
-	
+
 	if(!isalpha(name[0])) return false;
 	for(size_t i = 0; i < len; ++i) if(!isalnum(name[i]) && name[i] != '_') return false;
 	return true;
@@ -94,7 +94,7 @@ bool is_assigned(memory *mem, char *name) {
 unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	if(!valid_variable_name(name)) return NULL;
 	if(is_assigned(mem, name)) return NULL;
-	
+
 	node *n = create_node(name, u);
 	if(mem->head == NULL)
 		mem->head = mem->tail = n;
