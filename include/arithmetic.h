@@ -55,4 +55,11 @@ extern size_t tree_size(tree *t);
  */
 extern size_t tree_depth(tree *t);
 
+/**
+ * Create a file in the dot language to visualize a tree.
+ * @param t a tree
+ * @param filename the name where the data will be written
+ */
+extern void tree_to_dot(tree *t, char *filename);
+
 #endif //PROJET_ARITHMETIC_H

@@ -194,7 +194,7 @@ static node *simplify(node *n) {
 			n->right->operand.signe == (n->right->operand.signe == '-') ? '+' : '-';
 			return n->right;
 		}
-	} else if(n->operator == MUL){
+	} else if(n->operator == MUL) {
 		if(n->left->operator == NONE && isONE(n->left->operand)) {
 			free_node(n->left);
 			return n->right;
@@ -284,4 +284,67 @@ static size_t node_depth(node *n) {
 size_t tree_depth(tree *t) {
 	if(t == NULL) return 0;
 	return node_depth(t->root);
+}
+
+static char *etiquete(node *n) {
+	if(n == NULL) return concat("NULL");
+	if(n->operator == NONE) return unbounded_int2string(n->operand);
+	if(n->operator == ADD) return concat("ADD");
+	if(n->operator == SUB) return concat("SUB");
+	if(n->operator == MUL) return concat("MUL");
+	return concat("NULL");
+}
+
+static size_t find_index(node *tab[], size_t s, node *n) {
+	for(size_t i = 0; i < s; ++i)
+		if(tab[i] == n) return i;
+	return -1;
+}
+
+static void node_to_dot(node *n, FILE *f, size_t i, node *tab[], size_t size) {
+	if(n == NULL) return;
+	if(n->operator == NONE) {
+		char *a = etiquete(n), *b = unbounded_int2string(n->operand);
+		fprintf(f, "\"%zu-%s\" [label=\"%s\"];\n\n", i, a, b);
+		free(a);
+		free(b);
+	} else {
+		char *e_n = etiquete(n), *e_l = etiquete(n->left), *e_r = etiquete(n->right);
+		size_t l = find_index(tab, size, n->left), r = find_index(tab, size, n->right);
+
+		fprintf(f, "\"%zu-%s\" [label=\"%s\"];\n", i, e_n, e_n);
+		fprintf(f, "\"%zu-%s\" -> \"%zu-%s\";\n", i, e_n, l, e_l);
+		fprintf(f, "\"%zu-%s\" -> \"%zu-%s\";\n\n", i, e_n, r, e_r);
+
+		free(e_n);
+		free(e_l);
+		free(e_r);
+	}
+}
+
+static void fill_array(node *n, node **tab, size_t *i) {
+	if(n == NULL) return;
+	tab[*i] = n;
+	(*i)++;
+	if(n->operator != NONE) {
+		fill_array(n->left, tab, i);
+		fill_array(n->right, tab, i);
+	}
+}
+
+void tree_to_dot(tree *t, char *filename) {
+	if(t != NULL && t->root != NULL) {
+		FILE *f = fopen(filename, "w");
+		fprintf(f, "digraph tree {\n");
+		fprintf(f, "\tnode [shape=box];\n");
+
+		size_t size = tree_size(t), i = 0;
+		node *tab[size];
+		fill_array(t->root, tab, &i);
+		for(size_t j = 0; j < size; ++j)
+			node_to_dot(tab[j], f, j, tab, size);
+
+		fprintf(f, "}\n");
+		fclose(f);
+	}
 }
