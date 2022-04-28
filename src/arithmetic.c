@@ -4,9 +4,13 @@
 
 struct node {
 	operator operator;
-	unbounded_int operand;
-	struct node *left;
-	struct node *right;
+	union {
+		unbounded_int operand;
+		struct {
+			struct node *left;
+			struct node *right;
+		};
+	};
 };
 
 struct tree {
@@ -29,15 +33,17 @@ node *value_to_node(unbounded_int value) {
 	if(n == NULL) return NULL;
 	n->operator = NONE;
 	n->operand = value;
-	n->left = n->right = NULL;
 	return n;
 }
 
 void free_node(node *n) {
 	if(n == NULL) return;
-	free_unbounded_int(&n->operand);
-	free_node(n->left);
-	free_node(n->right);
+	if(n->operator == NONE)
+		free_unbounded_int(&n->operand);
+	else {
+		free_node(n->left);
+		free_node(n->right);
+	}
 	free(n);
 }
 
@@ -136,8 +142,12 @@ static char *operator_to_char(operator op) {
 
 static char *node_to_string(node *n) {
 	if(n == NULL) return NULL;
-	if(n->operator == NONE)
-		return concat("(", unbounded_int2string(n->operand), ")");
+	if(n->operator == NONE) {
+		char *str = unbounded_int2string(n->operand);
+		char *res = concat("(", unbounded_int2string(n->operand), ")");
+		free(str);
+		return res;
+	}
 
 	char *left = node_to_string(n->left);
 	char *right = node_to_string(n->right);
