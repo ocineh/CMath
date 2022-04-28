@@ -1,5 +1,5 @@
 #include <unbounded_int.h>
-#include <string.h>
+#include <strings.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -32,7 +32,7 @@ static void add_chiffre(unbounded_int *u, char n) {
 	}
 }
 
-static unbounded_int strip(unbounded_int u) {
+static unbounded_int strip_unbounded_int(unbounded_int u) {
 	if(u.len > 1 && u.premier->c == '0') {
 		chiffre *actual = u.premier;
 		while(actual != NULL && actual->c == '0') {
@@ -69,7 +69,7 @@ unbounded_int string2unbounded_int(const char *e) {
 
 		while(i < len && isdigit(e[i])) add_chiffre(&result, e[i++]);
 	}
-	return strip(result);
+	return strip_unbounded_int(result);
 }
 
 unbounded_int ll2unbounded_int(long long int i) {
@@ -264,11 +264,11 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	int cmp = cmp_abs(&a, &b);
 	if(a.signe != b.signe && cmp == 0) return ZERO;
 
-	if(a.signe == b.signe) return strip(add_same_sign(&a, &b));
+	if(a.signe == b.signe) return strip_unbounded_int(add_same_sign(&a, &b));
 	if(a.signe != b.signe) {
 		if(cmp == 0) return ZERO;
-		if(cmp == -1) return strip(add_diff_sign(&b, &a));
-		if(cmp == 1) return strip(add_diff_sign(&a, &b));
+		if(cmp == -1) return strip_unbounded_int(add_diff_sign(&b, &a));
+		if(cmp == 1) return strip_unbounded_int(add_diff_sign(&a, &b));
 	}
 	return NaN;
 }
