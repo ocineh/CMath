@@ -335,7 +335,6 @@ static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
 unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	if(isNaN(a) || isNaN(b)) return NaN;
 	if(isZERO(a) || isZERO(b)) return ZERO;
-	b = copy_unbounded_int(&b);
 
 	unbounded_int result = ZERO;
 	result.signe = (a.signe != b.signe && (a.signe == '-' || b.signe == '-')) ? '-' : '+';

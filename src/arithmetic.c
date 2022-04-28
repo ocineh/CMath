@@ -126,8 +126,10 @@ tree *string_to_tree(char *str) {
 	t->root = string_to_node(str);
 	if(t->root == NULL) {
 		free(t);
+		free(str);
 		return NULL;
 	}
+	free(str);
 	return t;
 }
 
@@ -144,7 +146,7 @@ static char *node_to_string(node *n) {
 	if(n == NULL) return NULL;
 	if(n->operator == NONE) {
 		char *str = unbounded_int2string(n->operand);
-		char *res = concat("(", unbounded_int2string(n->operand), ")");
+		char *res = concat("(", str, ")");
 		free(str);
 		return res;
 	}
