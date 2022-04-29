@@ -233,20 +233,30 @@ static node *evaluate_add_and_sub_node(node *n) {
 	if(n == NULL) return NULL;
 	if(n->operator == NONE) return n;
 
-	n->left = evaluate_add_and_sub_node(n->left);
-	n->right = evaluate_add_and_sub_node(n->right);
+	if(n->operator != NONE) {
+		if(n->left->operator != NONE) n->left = evaluate_add_and_sub_node(n->left);
+		if(n->left->operator == NONE && n->right->operator == NONE) {
+			if(n->operator == SUB) n->right->operand.signe = (n->right->operand.signe == '-') ? '+' : '-';
+			unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
+			free_node(n);
+			return value_to_node(res);
+		} else if(n->left->operator == NONE) {
+			node *successor = n->right;
+			while(successor->left->operator != NONE) successor = successor->left;
+			if(n->operator == SUB)
+				successor->left->operand.signe = (successor->left->operand.signe == '-') ? '+' : '-';
 
-	if(n->operator == ADD) {
-		unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
-		free_node(n);
-		return value_to_node(res);
+			unbounded_int res = unbounded_int_somme(n->left->operand, successor->left->operand);
+			free_node(successor->left);
+			successor->left = value_to_node(res);
+
+			node *tmp = n->right;
+			n->right = NULL;
+			free_node(n);
+			return evaluate_add_and_sub_node(tmp);
+		}
 	}
-	if(n->operator == SUB) {
-		n->right->operand.signe = (n->right->operand.signe == '+') ? '-' : '+';
-		unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
-		free_node(n);
-		return value_to_node(res);
-	}
+	n->right = evaluate_add_and_sub_node(n->right);
 	return n;
 }
 
