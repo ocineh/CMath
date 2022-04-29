@@ -260,12 +260,15 @@ static node *evaluate_add_and_sub_node(node *n) {
 	return n;
 }
 
-void evaluate(tree *t) {
+unbounded_int evaluate(tree *t) {
 	if(t != NULL && t->root != NULL) {
 		t->root = simplify(t->root);
 		t->root = evaluate_mul_node(t->root);
 		t->root = evaluate_add_and_sub_node(t->root);
+		if(t->root->operator == NONE)
+			return t->root->operand;
 	}
+	return NaN;
 }
 
 static size_t node_size(node *n) {

@@ -30,7 +30,7 @@ extern char *tree_to_string(tree *t);
  *
  * @param t a tree
  */
-extern void evaluate(tree *t);
+extern unbounded_int evaluate(tree *t);
 
 /**
  * Free a tree and all its nodes recursively.
