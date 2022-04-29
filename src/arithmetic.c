@@ -73,37 +73,31 @@ static operator char_to_operator(char c) {
 	}
 }
 
+#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*')
+
+static bool is_unary_operator(char *s, int i) {
+	return (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
+}
+
+static int next_operator(char *s, char c) {
+	size_t len = strlen(s);
+	for(int i = 0; i < len; ++i)
+		if(s[i] == c && !(is_unary_operator(s, i))) return i;
+	return -1;
+}
+
 static node *string_to_node(char *str) {
 	str = strip(str);
 	size_t len = strlen(str);
 
-	int pos = index_of(str, '+');
-	if(pos == -1) pos = index_of(str, '-');
-	if(pos == -1) pos = index_of(str, '*');
+	int pos = next_operator(str, '+');
+	if(pos == -1) pos = next_operator(str, '-');
+	if(pos == -1) pos = next_operator(str, '*');
 
-	if(pos <= 0) {
-		char *tmp = str;
-		++tmp;
-		while(is_digit(*tmp)) ++tmp;
-
-		int tmp_pos = index_of(tmp, '+');
-		if(tmp_pos == -1) tmp_pos = index_of(tmp, '-');
-		if(tmp_pos == -1) tmp_pos = index_of(tmp, '*');
-
-		if(tmp_pos == -1) {
-			unbounded_int value = string2unbounded_int(str);
-			free(str);
-			return value_to_node(value);
-		}
-
-		char *n = substring(str, 0, (tmp - str) + tmp_pos);
-		unbounded_int value = string2unbounded_int(n);
-		node *left = value_to_node(value);
-		operator op = char_to_operator(tmp[tmp_pos]);
-		node *node = operator_to_node(op, left, string_to_node(tmp + tmp_pos + 1));
-		free(n);
+	if(pos == -1) {
+		unbounded_int value = string2unbounded_int(str);
 		free(str);
-		return node;
+		return value_to_node(value);
 	}
 
 	char *left = strip_free(substring(str, 0, pos));
@@ -122,8 +116,10 @@ static node *string_to_node(char *str) {
 tree *string_to_tree(char *str) {
 	if(str == NULL) return NULL;
 	str = strip(str);
-	size_t len = strlen(str);
-	if(len == 0) return NULL;
+	char *tmp = remove_spaces(str);
+	free(str);
+	str = tmp;
+	if(*str == '\0') return NULL;
 
 	tree *t = malloc(sizeof(tree));
 	if(t == NULL) return NULL;
