@@ -88,13 +88,14 @@ unbounded_int ll2unbounded_int(long long int i) {
 }
 
 char *unbounded_int2string(unbounded_int i) {
-	char *res = malloc(sizeof(char) * (i.len + 2));
-	res[i.len + 1] = '\0';
-	res[0] = i.signe;
-
+	size_t len = i.len + (i.signe == '-') + 1;
+	char *res = malloc(sizeof(char) * len);
+	res[len - 1] = '\0';
+	int j = 0;
+	if(i.signe == '-') res[j++] = '-';
 	chiffre *p_chiffre = i.premier;
-	for(int j = 1; j <= i.len && p_chiffre != NULL; ++j) {
-		res[j] = p_chiffre->c;
+	while(j <= i.len && p_chiffre != NULL) {
+		res[j++] = p_chiffre->c;
 		p_chiffre = p_chiffre->suivant;
 	}
 	return res;
