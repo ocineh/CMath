@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "strings.h"
+#include "arithmetic.h"
 
 typedef struct node {
 	char *name;
@@ -119,4 +120,12 @@ void print(interpreter *interpreter, char *name) {
 	unbounded_int *u = value_of(interpreter->memory, name);
 	if(u == NULL) fprintf(interpreter->output, "Variable %s not found.\n", name);
 	else fprintf(interpreter->output, "%s = %s\n", name, unbounded_int2string(*u));
+}
+
+unbounded_int eval(char *line) {
+	if(!is_arithmetic_expression(line)) return NaN;
+	tree *t = string_to_tree(line);
+	unbounded_int value = evaluate(t);
+	free_tree(t);
+	return value;
 }

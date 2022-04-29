@@ -68,7 +68,7 @@ extern unbounded_int *value_of(memory *mem, char *name);
  * @param line the operation to be evaluated
  * @return the result of the operation
  */
-extern unbounded_int *eval(char *line);
+extern unbounded_int eval(char *line);
 
 /**
  * Print the value of a variable.
