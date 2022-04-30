@@ -122,11 +122,60 @@ void print(interpreter *interpreter, char *name) {
 	else fprintf(interpreter->output, "%s = %s\n", name, unbounded_int2string(*u));
 }
 
-unbounded_int eval(char *line) {
-	if(!is_arithmetic_expression(line)) return NaN;
-	tree *t = string_to_tree(line);
+static void find_variable_name(char *s, size_t *begin, size_t *end) {
+	*begin = 0;
+	while(*s != '\0' && !isalpha(*s)) {
+		++s;
+		++(*begin);
+	}
+	*end = *begin;
+	while(*s != '\0' && isalnum(*s)) {
+		++s;
+		++(*end);
+	}
+}
+
+static char *replace_variable_name_by_value(interpreter *inter, char *str) {
+	if(str == NULL || str[0] == '\0') return NULL;
+
+	size_t pos = 0;
+	char *result = concat(str);
+	while(result[pos] != '\0') {
+		size_t begin, end;
+		find_variable_name(result, &begin, &end);
+		if(result[begin] == '\0') break;
+		char *name = substring(result, begin, end);
+
+		unbounded_int *u = value_of(inter->memory, name);
+		if(u == NULL) {
+			free(name);
+			free(result);
+			return NULL;
+		}
+		char *value = unbounded_int2string(*u);
+
+		char *left = substring(result, 0, begin);
+		char *right = substring(result, end, strlen(result));
+
+		char *tmp = concat(left, value, right);
+		pos = strlen(left) + strlen(value);
+		free(left);
+		free(right);
+		free(name);
+		free(value);
+		free(result);
+		result = tmp;
+	}
+	return result;
+}
+
+unbounded_int eval(interpreter *inter, char *line) {
+	char *str = replace_variable_name_by_value(inter, line);
+	if(str == NULL || !is_arithmetic_expression(str)) return NaN;
+	tree *t = string_to_tree(str);
 	unbounded_int value = evaluate(t);
 	value = copy_unbounded_int(&value);
 	free_tree(t);
+	free(str);
 	return value;
 }
