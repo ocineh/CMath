@@ -133,14 +133,15 @@ bool is_digit(char c) {
 
 char *remove_spaces(char *s) {
 	size_t len = 0;
-	char *i = s;
-	while(*i != '\0') if(!isspace(*(i++))) ++len;
+	char *tmp = s;
+	while(*tmp != '\0') if(!isspace(*(tmp++))) ++len;
 
 	char *res = malloc(len + 1);
 	for(int j = 0, i = 0; j < len; ++j) {
 		while(isspace(s[i])) ++i;
 		res[j] = s[i++];
 	}
+	res[len] = '\0';
 	return res;
 }
 
