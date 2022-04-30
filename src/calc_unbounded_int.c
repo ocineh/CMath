@@ -126,6 +126,7 @@ unbounded_int eval(char *line) {
 	if(!is_arithmetic_expression(line)) return NaN;
 	tree *t = string_to_tree(line);
 	unbounded_int value = evaluate(t);
+	value = copy_unbounded_int(&value);
 	free_tree(t);
 	return value;
 }
