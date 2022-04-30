@@ -34,7 +34,7 @@ static char *extract(char *s, size_t begin, size_t end) {
 }
 
 size_t split(char *line, char separator, char ***tokens) {
-	size_t count = 0, len = strlen(line);
+	size_t count = 1, len = strlen(line);
 	for(size_t i = 0; i < len; ++i) {
 		if(line[i] == separator) {
 			size_t j = i + 1;
@@ -142,4 +142,11 @@ char *remove_spaces(char *s) {
 		res[j] = s[i++];
 	}
 	return res;
+}
+
+bool is_empty(const char *s) {
+	if(s == NULL) return true;
+	if(s[0] == '\0') return true;
+	while(*s != '\0' && *s != ' ') ++s;
+	return *s == '\0';
 }

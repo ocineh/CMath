@@ -87,4 +87,6 @@ extern bool is_digit(char c);
 
 extern char *remove_spaces(char *s);
 
+extern bool is_empty(const char *s);
+
 #endif //PROJET_STRINGS_H
