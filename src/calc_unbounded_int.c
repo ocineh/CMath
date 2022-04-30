@@ -179,3 +179,44 @@ unbounded_int eval(interpreter *inter, char *line) {
 	free(str);
 	return value;
 }
+
+void interpret(interpreter *inter) {
+	char buffer[1024];
+	do {
+		fgets(buffer, 1024, inter->input);
+		if(is_empty(buffer) || buffer[0] == '#') continue;
+
+		int pos = index_of(buffer, '=');
+		if(pos != -1) { // Assignment
+			// Parse
+			char *name = strip(substring(buffer, 0, pos));
+			char *value = strip(substring(buffer, pos + 1, strlen(buffer)));
+			if(!valid_variable_name(name)) {
+				fprintf(inter->output, "Invalid variable name.\n");
+				continue;
+			}
+
+			// Evaluate
+			unbounded_int u = eval(inter, value);
+			if(isNaN(u)) {
+				fprintf(inter->output, "Invalid expression.\n");
+				continue;
+			}
+
+			// Assign
+			unbounded_int *v = assign(inter->memory, name, u);
+			if(v == NULL) fprintf(inter->output, "Variable %s already exists.\n", name);
+		} else { // Print
+			pos = index_of(buffer, ' ');
+			if(pos != -1) {
+				char *command = strip(substring(buffer, 0, pos));
+				if(strcmp(command, "print") == 0) {
+					char *name = strip(substring(buffer, pos + 1, strlen(buffer)));
+					unbounded_int *u = value_of(inter->memory, name);
+					if(u == NULL) fprintf(inter->output, "Variable %s not found.\n", name);
+					else fprintf(inter->output, "%s = %s\n", name, unbounded_int2string(*u));
+				}
+			}
+		}
+	} while(*buffer != EOF && *buffer != '\0' && strcmp(buffer, "exit") != 0);
+}

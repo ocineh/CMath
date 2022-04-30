@@ -22,7 +22,7 @@ extern void destroy_interpreter(interpreter *interpreter);
  * @param input the file with the instructions to execute
  * @param output The file to which the result is redirected
  */
-extern void interpret(interpreter *interpreter);
+extern void interpret(interpreter *inter);
 
 /**
  * Checks if the variable name is valid.
