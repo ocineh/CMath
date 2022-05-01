@@ -133,7 +133,11 @@ unbounded_int *value_of(memory *mem, char *name) {
 void print(interpreter *interpreter, char *name) {
 	unbounded_int *u = value_of(interpreter->memory, name);
 	if(u == NULL) fprintf(interpreter->output, "Variable %s not found.\n", name);
-	else fprintf(interpreter->output, "%s = %s\n", name, unbounded_int2string(*u));
+	else {
+		char *str = unbounded_int2string(*u);
+		fprintf(interpreter->output, "%s = %s\n", name, str);
+		free(str);
+	}
 }
 
 static void find_variable_name(char *s, size_t *begin, size_t *end) {
@@ -195,7 +199,7 @@ unbounded_int eval(interpreter *inter, char *line) {
 }
 
 void interpret(interpreter *inter) {
-	char buffer[1024];
+	char buffer[1024], *tmp;
 	do {
 		fgets(buffer, 1024, inter->input);
 		if(is_empty(buffer) || buffer[0] == '#') continue;
@@ -203,8 +207,10 @@ void interpret(interpreter *inter) {
 		int pos = index_of(buffer, '=');
 		if(pos != -1) { // Assignment
 			// Parse
-			char *name = strip(substring(buffer, 0, pos));
-			char *value = strip(substring(buffer, pos + 1, strlen(buffer)));
+			char *name = strip(tmp = substring(buffer, 0, pos));
+			free(tmp);
+			char *value = strip(tmp = substring(buffer, pos + 1, strlen(buffer)));
+			free(tmp);
 			if(!valid_variable_name(name)) {
 				fprintf(inter->output, "Invalid variable name.\n");
 				continue;
@@ -220,14 +226,21 @@ void interpret(interpreter *inter) {
 			// Assign
 			unbounded_int *v = assign(inter->memory, name, u);
 			if(v == NULL) fprintf(inter->output, "Variable %s already exists.\n", name);
+
+			free(name);
+			free(value);
 		} else { // Print
 			pos = index_of(buffer, ' ');
 			if(pos != -1) {
-				char *command = strip(substring(buffer, 0, pos));
+				char *command = strip(tmp = substring(buffer, 0, pos));
+				free(tmp);
 				if(strcmp(command, "print") == 0) {
-					char *name = strip(substring(buffer, pos + 1, strlen(buffer)));
+					char *name = strip(tmp = substring(buffer, pos + 1, strlen(buffer)));
 					print(inter, name);
+					free(tmp);
+					free(name);
 				}
+				free(command);
 			}
 		}
 	} while(*buffer != EOF && *buffer != '\0' && strcmp(buffer, "exit") != 0);
