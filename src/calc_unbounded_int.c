@@ -132,7 +132,7 @@ unbounded_int *value_of(memory *mem, char *name) {
 
 void print(interpreter *interpreter, char *name) {
 	unbounded_int *u = value_of(interpreter->memory, name);
-	if(u == NULL) fprintf(interpreter->output, "Variable %s not found.\n", name);
+	if(u == NULL) fprintf(interpreter->error, "Variable %s not found.\n", name);
 	else {
 		char *str = unbounded_int2string(*u);
 		fprintf(interpreter->output, "%s = %s\n", name, str);
@@ -201,7 +201,7 @@ unbounded_int eval(interpreter *inter, char *line) {
 void interpret(interpreter *inter) {
 	char buffer[1024], *tmp;
 	do {
-		fgets(buffer, 1024, inter->input);
+		if(fgets(buffer, 1024, inter->input) == NULL) break;
 		if(is_empty(buffer) || buffer[0] == '#') continue;
 
 		int pos = index_of(buffer, '=');
@@ -212,24 +212,25 @@ void interpret(interpreter *inter) {
 			char *value = strip(tmp = substring(buffer, pos + 1, strlen(buffer)));
 			free(tmp);
 			if(!valid_variable_name(name)) {
-				fprintf(inter->output, "Invalid variable name.\n");
+				fprintf(inter->error, "Invalid variable name.\n");
 				continue;
 			}
 
 			// Evaluate
 			unbounded_int u = eval(inter, value);
 			if(isNaN(u)) {
-				fprintf(inter->output, "Invalid expression.\n");
+				fprintf(inter->error, "Invalid expression.\n");
 				continue;
 			}
 
 			// Assign
 			unbounded_int *v = assign(inter->memory, name, u);
-			if(v == NULL) fprintf(inter->output, "Variable %s already exists.\n", name);
+			if(v == NULL) fprintf(inter->error, "Variable %s already exists.\n", name);
 
 			free(name);
 			free(value);
-		} else { // Print
+		} else if(strstr(buffer, "exit") != NULL) break;
+		else {
 			pos = index_of(buffer, ' ');
 			if(pos != -1) {
 				char *command = strip(tmp = substring(buffer, 0, pos));
@@ -239,7 +240,7 @@ void interpret(interpreter *inter) {
 					print(inter, name);
 					free(tmp);
 					free(name);
-				}
+				} else fprintf(inter->error, "Unknown command: %s\n", command);
 				free(command);
 			}
 		}
