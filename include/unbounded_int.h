@@ -137,6 +137,6 @@ extern unbounded_int copy_unbounded_int(unbounded_int *a);
  * @param n the exponent
  * @return the result of the exponentiation
  */
-extern unbounded_int unbounded_int_pow(unbounded_int u, unsigned long long n);
+extern unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n);
 
 #endif //PROJET_UNBOUNDED_INT_H

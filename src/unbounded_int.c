@@ -358,15 +358,24 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	return result;
 }
 
-unbounded_int unbounded_int_pow(unbounded_int u, unsigned long long n) {
-	if(n < 0) return NaN;
-	if(n == 0) return string2unbounded_int("1");
+unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
+	if(isZERO(n)) return string2unbounded_int("1");
+	if(n.signe == '-') return NaN;
+	n = copy_unbounded_int(&n);
 
 	unbounded_int result = copy_unbounded_int(&u);
-	while(n-- > 1) {
+	unbounded_int one = string2unbounded_int("1"), minus_one = string2unbounded_int("-1");
+	while(unbounded_int_cmp_unbounded_int(n, one) == 1) {
 		unbounded_int tmp = unbounded_int_produit(result, u);
 		free_unbounded_int(&result);
 		result = tmp;
+
+		tmp = unbounded_int_somme(n, minus_one);
+		free_unbounded_int(&n);
+		n = tmp;
 	}
+	free_unbounded_int(&n);
+	free_unbounded_int(&one);
+	free_unbounded_int(&minus_one);
 	return result;
 }
