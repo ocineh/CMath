@@ -10,7 +10,7 @@ typedef struct memory memory;
 
 typedef struct interpreter interpreter;
 
-extern interpreter *create_interpreter(FILE *input, FILE *output);
+extern interpreter *create_interpreter(FILE *input, FILE *output, FILE *error);
 
 extern void destroy_interpreter(interpreter *interpreter);
 

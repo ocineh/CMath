@@ -21,6 +21,7 @@ typedef struct interpreter {
 	memory *memory;
 	FILE *input;
 	FILE *output;
+	FILE *error;
 } interpreter;
 
 static node *create_node(char *name, unbounded_int value) {
@@ -33,19 +34,26 @@ static node *create_node(char *name, unbounded_int value) {
 
 static memory *create_memory() {
 	memory *mem = malloc(sizeof(memory));
+	if(mem == NULL) return NULL;
 	mem->size = 0;
 	mem->head = mem->tail = NULL;
 	return mem;
 }
 
-interpreter *create_interpreter(FILE *input, FILE *output) {
+interpreter *create_interpreter(FILE *input, FILE *output, FILE *error) {
 	if(input == NULL) input = stdin;
 	if(output == NULL) output = stdout;
 
 	interpreter *interp = malloc(sizeof(interpreter));
+	if(interp == NULL) return NULL;
+	interp->memory = create_memory();
 	interp->input = input;
 	interp->output = output;
-	interp->memory = create_memory();
+	interp->error = error;
+	if(interp->memory == NULL) {
+		destroy_interpreter(interp);
+		return NULL;
+	}
 	return interp;
 }
 
@@ -56,6 +64,7 @@ static void destroy_node(node *n) {
 }
 
 static void destroy_memory(memory *mem) {
+	if(mem == NULL) return;
 	node *curr = mem->head;
 	while(curr != NULL) {
 		node *next = curr->next;
@@ -70,6 +79,7 @@ void destroy_interpreter(interpreter *interpreter) {
 	destroy_memory(interpreter->memory);
 	fclose(interpreter->input);
 	fclose(interpreter->output);
+	fclose(interpreter->error);
 	free(interpreter);
 }
 
