@@ -148,6 +148,6 @@ char *remove_spaces(char *s) {
 bool is_empty(const char *s) {
 	if(s == NULL) return true;
 	if(s[0] == '\0') return true;
-	while(*s != '\0' && *s != ' ') ++s;
+	while(*s == ' ') ++s;
 	return *s == '\0';
 }
