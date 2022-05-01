@@ -66,6 +66,7 @@ extern bool is_number(const char *s);
 
 extern char *__concat__(char *s, ...);
 #define concat(...) __concat__(__VA_ARGS__, NULL)
+#define copy(s) concat(s)
 
 /**
  * Returns if the character is a digit or an arithmetic operator.
