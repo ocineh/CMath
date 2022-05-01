@@ -222,9 +222,7 @@ void interpret(interpreter *inter) {
 				char *command = strip(substring(buffer, 0, pos));
 				if(strcmp(command, "print") == 0) {
 					char *name = strip(substring(buffer, pos + 1, strlen(buffer)));
-					unbounded_int *u = value_of(inter->memory, name);
-					if(u == NULL) fprintf(inter->output, "Variable %s not found.\n", name);
-					else fprintf(inter->output, "%s = %s\n", name, unbounded_int2string(*u));
+					print(inter, name);
 				}
 			}
 		}
