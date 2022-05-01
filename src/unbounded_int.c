@@ -88,6 +88,7 @@ unbounded_int ll2unbounded_int(long long int i) {
 }
 
 char *unbounded_int2string(unbounded_int i) {
+	if(isNaN(i)) return concat("NaN");
 	size_t len = i.len + (i.signe == '-') + 1;
 	char *res = malloc(sizeof(char) * len);
 	res[len - 1] = '\0';
@@ -378,4 +379,38 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 	free_unbounded_int(&one);
 	free_unbounded_int(&minus_one);
 	return result;
+}
+
+unbounded_int unbounded_int_div(unbounded_int a, unbounded_int b) {
+	if(isNaN(a) || isNaN(b) || isZERO(b)) return NaN;
+	if(isZERO(a)) return ZERO;
+	bool minus = a.signe != b.signe;
+	if(isONE(b)) {
+		a = copy_unbounded_int(&a);
+		a.signe = minus ? '-' : '+';
+		return a;
+	}
+	int cmp = cmp_abs(&a, &b);
+	if(cmp == -1) return ZERO;
+	if(cmp == 0) return string2unbounded_int(minus ? "-1" : "1");
+
+	a = copy_unbounded_int(&a);
+	unbounded_int pas = copy_unbounded_int(&b);
+	a.signe = b.signe = '+';
+	pas.signe = '-';
+
+	unbounded_int count = string2unbounded_int("0"), one = string2unbounded_int("1");
+	while(unbounded_int_cmp_unbounded_int(a, b) >= 0) {
+		unbounded_int tmp = unbounded_int_somme(a, pas);
+		free_unbounded_int(&a);
+		a = tmp;
+
+		tmp = unbounded_int_somme(count, one);
+		free_unbounded_int(&count);
+		count = tmp;
+	}
+	count.signe = minus ? '-' : '+';
+	free_unbounded_int(&a);
+	free_unbounded_int(&pas);
+	return count;
 }

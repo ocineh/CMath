@@ -139,4 +139,6 @@ extern unbounded_int copy_unbounded_int(unbounded_int *a);
  */
 extern unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n);
 
+extern unbounded_int unbounded_int_div(unbounded_int a, unbounded_int b);
+
 #endif //PROJET_UNBOUNDED_INT_H
