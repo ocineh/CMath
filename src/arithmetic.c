@@ -3,7 +3,7 @@
 #include "strings.h"
 
 typedef enum operator {
-	ADD, SUB, MUL, NONE
+	ADD, SUB, MUL, POW, NONE
 } operator;
 
 typedef struct node {
@@ -69,14 +69,15 @@ static operator char_to_operator(char c) {
 		case '+': return ADD;
 		case '-': return SUB;
 		case '*': return MUL;
+		case '^': return POW;
 		default: return NONE;
 	}
 }
 
-#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*')
+#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '^')
 
 static bool is_unary_operator(char *s, int i) {
-	return (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
+	return s[i] != '^' && (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
 }
 
 static int next_operator(char *s, char c) {
@@ -93,6 +94,7 @@ static node *string_to_node(char *str) {
 	int pos = next_operator(str, '+');
 	if(pos == -1) pos = next_operator(str, '-');
 	if(pos == -1) pos = next_operator(str, '*');
+	if(pos == -1) pos = next_operator(str, '^');
 
 	if(pos == -1) {
 		unbounded_int value = string2unbounded_int(str);
@@ -138,6 +140,7 @@ static char *operator_to_char(operator op) {
 		case ADD: return "+";
 		case SUB: return "-";
 		case MUL: return "*";
+		case POW: return "^";
 		default: return "\0";
 	}
 }
@@ -209,19 +212,40 @@ static node *simplify(node *n) {
 			free_node(n->left);
 			return value_to_node(ZERO);
 		}
+	} else if(n->operator == POW) {
+		if(n->right->operator == NONE) {
+			if(isONE(n->right->operand)) {
+				free_node(n->right);
+				return n->left;
+			} else if(isZERO(n->right->operand)) {
+				free_node(n);
+				return value_to_node(string2unbounded_int("1"));
+			} else if(n->right->operand.signe == '-') {
+				free_node(n);
+				return value_to_node(NaN);
+			}
+		}
 	}
 	return n;
 }
 
-static node *evaluate_mul_node(node *n) {
+static node *evaluate_mul_and_pow_node(node *n) {
 	if(n == NULL) return NULL;
+	if(n->operator == NONE) return n;
 
 	if(n->operator != NONE) {
-		n->left = evaluate_mul_node(n->left);
-		n->right = evaluate_mul_node(n->right);
+		n->left = evaluate_mul_and_pow_node(n->left);
+		n->right = evaluate_mul_and_pow_node(n->right);
 	}
 
-	if(n->operator == MUL) {
+	if(n->operator == POW) {
+		unbounded_int res = unbounded_int_pow(n->left->operand, n->right->operand);
+		free_node(n->left);
+		// free_node(n->right);
+		n->right = NULL;
+		free(n);
+		return value_to_node(res);
+	} else if(n->operator == MUL) {
 		unbounded_int res = unbounded_int_produit(n->left->operand, n->right->operand);
 		free_node(n);
 		return value_to_node(res);
@@ -263,10 +287,10 @@ static node *evaluate_add_and_sub_node(node *n) {
 unbounded_int evaluate(tree *t) {
 	if(t != NULL && t->root != NULL) {
 		t->root = simplify(t->root);
-		t->root = evaluate_mul_node(t->root);
+		t->root = evaluate_mul_and_pow_node(t->root);
 		t->root = evaluate_add_and_sub_node(t->root);
 		if(t->root->operator == NONE)
-			return t->root->operand;
+			return copy_unbounded_int(&t->root->operand);
 	}
 	return NaN;
 }
@@ -301,6 +325,7 @@ static char *etiquete(node *n) {
 	if(n->operator == ADD) return concat("ADD");
 	if(n->operator == SUB) return concat("SUB");
 	if(n->operator == MUL) return concat("MUL");
+	if(n->operator == POW) return concat("POW");
 	return concat("NULL");
 }
 
