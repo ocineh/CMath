@@ -17,9 +17,12 @@ The application can be launched with two optional options:
   read the instructions.
 - `-o <FILE>` To specify the name of the file to which write
   the results.
+- `-e <FILE>` To specify the name of the file to which write
+  the errors.
 
-By default, instructions will be read from **stdin** and
-results will be written to **stdout**.
+By default, instructions will be read from **stdin**, the
+results will be written to **stdout** and the errors will be
+written to **stderr**.
 
 ## Usage
 
@@ -41,7 +44,7 @@ cmake --build build
 3. run the project
 
 ```shell
-./build/app/app -i [INPUT-FILE] -o [OUTPUT-FILE]
+./build/app/app -i <FILE> -o <FILE> -e <FILE> 
 ```
 
 4. run the tests
@@ -68,7 +71,6 @@ cmake --build build --target test
     - [x] Calculate the difference between two unbounded_int
     - [x] Calculate the product of two unbounded_int
   - Interpreter
-    - [ ] Create a variable
-    - [ ] Evaluate an expression (arithmetic, comparison or
-      assignment)
-    - [ ] Print a variable
+    - [x] Assign a variable name with a value
+    - [x] Evaluate an expression (arithmetic, comparison or assignment)
+    - [x] Print a variable
