@@ -26,7 +26,8 @@ typedef struct interpreter {
 
 static node *create_node(char *name, unbounded_int value) {
 	node *n = malloc(sizeof(node));
-	n->name = name;
+	if(n == NULL) return NULL;
+	n->name = copy(name);
 	n->value = value;
 	n->next = n->prev = NULL;
 	return n;
@@ -103,10 +104,13 @@ bool is_assigned(memory *mem, char *name) {
 }
 
 unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
+	if(mem == NULL || name == NULL || isNaN(u)) return NULL;
 	if(!valid_variable_name(name)) return NULL;
 	if(is_assigned(mem, name)) return NULL;
 
 	node *n = create_node(name, u);
+	if(n == NULL) return NULL;
+	mem->size++;
 	if(mem->head == NULL)
 		mem->head = mem->tail = n;
 	else {
