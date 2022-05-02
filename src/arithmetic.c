@@ -170,139 +170,124 @@ char *tree_to_string(tree *t) {
 	return node_to_string(t->root);
 }
 
-static node *simplify(node *n) {
-	if(n == NULL) return NULL;
-	if(n->operator == NONE) return n;
-
-	n->left = simplify(n->left);
-	n->right = simplify(n->right);
-
-	if(n->operator == ADD) {
-		if(n->left->operator == NONE && isZERO(n->left->operand)) {
-			free_node(n->left);
-			return n->right;
-		}
-		if(n->right->operator == NONE && isZERO(n->right->operand)) {
-			free_node(n->right);
-			return n->left;
-		}
-	} else if(n->operator == SUB) {
-		if(n->right->operator == NONE && isZERO(n->right->operand)) {
-			free_node(n->right);
-			return n->left;
-		}
-		if(n->left->operator == NONE && isZERO(n->left->operand)) {
-			free_node(n->left);
-			n->right->operand.signe == (n->right->operand.signe == '-') ? '+' : '-';
-			return n->right;
-		}
-	} else if(n->operator == MUL) {
-		if(n->left->operator == NONE && isONE(n->left->operand)) {
-			free_node(n->left);
-			return n->right;
-		}
-		if(n->right->operator == NONE && isONE(n->right->operand)) {
-			free_node(n->right);
-			return n->left;
-		}
-		if(n->left->operator == NONE && isZERO(n->left->operand)) {
-			free_node(n->left);
-			free_node(n->right);
-			return value_to_node(ZERO);
-		}
-		if(n->right->operator == NONE && isZERO(n->right->operand)) {
-			free_node(n->right);
-			free_node(n->left);
-			return value_to_node(ZERO);
-		}
-	} else if(n->operator == POW) {
+static node *evaluate_pow(node *n) {
+	if(n->operator == POW) {
 		if(n->right->operator == NONE) {
-			if(isONE(n->right->operand)) {
-				free_node(n->right);
-				return n->left;
-			} else if(isZERO(n->right->operand)) {
+			if(isZERO(n->right->operand) || n->right->operand.signe == '-') {
 				free_node(n);
 				return value_to_node(string2unbounded_int("1"));
-			} else if(n->right->operand.signe == '-') {
-				free_node(n);
-				return value_to_node(NaN);
-			}
-		}
-	} else if(n->operator == DIV) {
-		if(n->right->operator == NONE) {
-			if(isZERO(n->right->operand)) {
-				free_node(n);
-				return value_to_node(NaN);
 			} else if(isONE(n->right->operand)) {
-				free_node(n->right);
-				return n->left;
+				node *tmp = n->left;
+				n->left = NULL;
+				free_node(n);
+				return tmp;
+			} else if(n->left->operator == NONE) {
+				unbounded_int res = unbounded_int_pow(n->left->operand, n->right->operand);
+				free_node(n);
+				return value_to_node(res);
 			}
 		}
 	}
 	return n;
 }
 
-static node *evaluate_mul_and_div_and_pow_node(node *n) {
-	if(n == NULL) return NULL;
-	if(n->operator == NONE) return n;
-
-	if(n->operator != NONE) {
-		n->left = evaluate_mul_and_div_and_pow_node(n->left);
-		n->right = evaluate_mul_and_div_and_pow_node(n->right);
-	}
-
-	if(n->operator == POW) {
-		unbounded_int res = unbounded_int_pow(n->left->operand, n->right->operand);
-		free_node(n);
-		return value_to_node(res);
-	} else if(n->operator == MUL) {
-		unbounded_int res = unbounded_int_produit(n->left->operand, n->right->operand);
-		free_node(n);
-		return value_to_node(res);
-	} else if(n->operator == DIV) {
-		unbounded_int res = unbounded_int_div(n->left->operand, n->right->operand);
-		free_node(n);
-		return value_to_node(res);
+static node *evaluate_mul(node *n) {
+	if(n->operator == MUL) {
+		if(n->left->operator == NONE) {
+			if(isONE(n->left->operand)) {
+				node *tmp = n->right;
+				n->right = NULL;
+				free_node(n);
+				return tmp;
+			} else if(isZERO(n->left->operand)) {
+				free_node(n);
+				return value_to_node(ZERO);
+			}
+		}
+		if(n->right->operator == NONE) {
+			if(isONE(n->right->operand)) {
+				node *tmp = n->left;
+				n->left = NULL;
+				free_node(n);
+				return tmp;
+			} else if(isZERO(n->right->operand)) {
+				free_node(n);
+				return value_to_node(ZERO);
+			}
+		}
+		if(n->right->operator == NONE && n->left->operator == NONE) {
+			unbounded_int res = unbounded_int_produit(n->left->operand, n->right->operand);
+			free_node(n);
+			return value_to_node(res);
+		}
 	}
 	return n;
 }
 
-static node *evaluate_add_and_sub_node(node *n) {
-	if(n == NULL) return NULL;
-	if(n->operator == NONE) return n;
-
-	if(n->operator != NONE) {
-		if(n->left->operator != NONE) n->left = evaluate_add_and_sub_node(n->left);
+static node *evaluate_div(node *n) {
+	if(n->operator == DIV) {
+		if(n->right->operator == NONE) {
+			if(isONE(n->right->operand)) {
+				node *tmp = n->left;
+				n->left = NULL;
+				free_node(n);
+				return tmp;
+			} else if(isZERO(n->right->operand)) {
+				free_node(n);
+				return value_to_node(NaN);
+			}
+		}
 		if(n->left->operator == NONE && n->right->operator == NONE) {
-			if(n->operator == SUB) n->right->operand.signe = (n->right->operand.signe == '-') ? '+' : '-';
+			unbounded_int res = unbounded_int_div(n->left->operand, n->right->operand);
+			free_node(n);
+			return value_to_node(res);
+		}
+	}
+	return n;
+}
+
+static node *evaluate_add(node *n) {
+	if(n->operator == ADD) {
+		if(n->left->operator == NONE && n->right->operator == NONE) {
 			unbounded_int res = unbounded_int_somme(n->left->operand, n->right->operand);
 			free_node(n);
 			return value_to_node(res);
-		} else if(n->left->operator == NONE) {
-			node *successor = n->right;
-			while(successor->left->operator != NONE) successor = successor->left;
-			if(n->operator == SUB)
-				successor->left->operand.signe = (successor->left->operand.signe == '-') ? '+' : '-';
-
-			unbounded_int res = unbounded_int_somme(n->left->operand, successor->left->operand);
-			free_node(successor->left);
-			successor->left = value_to_node(res);
-
-			node *tmp = n->right;
-			n->right = NULL;
-			free_node(n);
-			return evaluate_add_and_sub_node(tmp);
 		}
 	}
-	n->right = evaluate_add_and_sub_node(n->right);
 	return n;
+}
+
+static node *evaluate_sub(node *n) {
+	if(n->operator == SUB) {
+		if(n->left->operator == NONE && n->right->operator == NONE) {
+			n->right->operand.signe = (n->right->operand.signe == '+') ? '-' : '+';
+			n->operator = ADD;
+			return evaluate_add(n);
+		}
+	}
+	return n;
+}
+
+static node *evaluate_node(node *n) {
+	if(n == NULL) return NULL;
+	if(n->operator != NONE) {
+		n->left = evaluate_node(n->left);
+		n->right = evaluate_node(n->right);
+	}
+
+	switch(n->operator) {
+		case ADD: return evaluate_add(n);
+		case SUB: return evaluate_sub(n);
+		case MUL: return evaluate_mul(n);
+		case POW: return evaluate_pow(n);
+		case DIV: return evaluate_div(n);
+		case NONE: return n;
+	}
 }
 
 unbounded_int evaluate(tree *t) {
 	if(t != NULL && t->root != NULL) {
-		t->root = simplify(t->root);
-		t->root = evaluate_mul_and_div_and_pow_node(t->root);
-		t->root = evaluate_add_and_sub_node(t->root);
+		t->root = evaluate_node(t->root);
 		if(t->root->operator == NONE)
 			return copy_unbounded_int(&t->root->operand);
 	}
