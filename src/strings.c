@@ -60,7 +60,6 @@ int index_of(const char *s, char c) {
 }
 
 char *substring(const char *s, size_t begin, size_t end) {
-	size_t len = strlen(s);
 	char *new = malloc(end - begin + 1);
 	memmove(new, s + begin, end - begin + 1);
 	new[end - begin] = '\0';

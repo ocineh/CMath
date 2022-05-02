@@ -4,19 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void print_unbounded_int(unbounded_int *u) {
-	if(u->signe == '*') printf("NaN\n");
-	else {
-		printf("%c", u->signe);
-		chiffre *actual = u->premier;
-		while(actual != NULL) {
-			printf("%c", actual->c);
-			actual = actual->suivant;
-		}
-		printf("\n");
-	}
-}
-
 static void add_chiffre(unbounded_int *u, char n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
 	p_chiffre->c = n;
@@ -223,7 +210,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe != b->signe) {
 		unbounded_int r = { .signe= (char) (cmp_abs(a, b) == 1 ? a->signe
 															   : b->signe), .len=0, .premier=NULL, .dernier=NULL };
-		short hold = 0, tmp = 0;
+		short hold = 0, tmp;
 
 		chiffre *p_a = a->dernier, *p_b = b->dernier;
 		while(p_a != NULL && p_b != NULL) {
