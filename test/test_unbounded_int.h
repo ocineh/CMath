@@ -25,4 +25,16 @@ extern bool test_create_string_from_uint(void);
 
 extern bool test_create_string_from_uint_2(void);
 
+// Test the comparison of an unbounded int with another unbounded int or a long long int
+
+extern bool test_uint_cmp_with_uint(void);
+
+extern bool test_uint_cmp_with_uint_2(void);
+
+extern bool test_uint_cmp_with_uint_3(void);
+
+extern bool test_uint_cmp_with_ll(void);
+
+extern bool test_uint_cmp_with_ll_2(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

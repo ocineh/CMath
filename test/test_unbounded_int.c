@@ -71,3 +71,65 @@ bool test_create_string_from_uint_2(void) {
 	free(s);
 	return result;
 }
+
+bool test_uint_cmp_with_uint(void) {
+	unbounded_int u = string2unbounded_int("8908");
+	unbounded_int v = string2unbounded_int("3678");
+
+	bool result = unbounded_int_cmp_unbounded_int(u, v) == 1;
+	if(result && unbounded_int_cmp_unbounded_int(v, u) != -1) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(u, u) != 0) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(v, v) != 0) result = false;
+
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_cmp_with_uint_2(void) {
+	unbounded_int u = string2unbounded_int("-8908");
+	unbounded_int v = string2unbounded_int("-3678");
+
+	bool result = unbounded_int_cmp_unbounded_int(u, v) == -1;
+	if(result && unbounded_int_cmp_unbounded_int(v, u) != 1) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(u, u) != 0) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(v, v) != 0) result = false;
+
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return 0;
+}
+
+bool test_uint_cmp_with_uint_3(void) {
+	unbounded_int u = string2unbounded_int("-8908");
+	unbounded_int v = string2unbounded_int("3678");
+
+	bool result = unbounded_int_cmp_unbounded_int(u, v) == -1;
+	if(result && unbounded_int_cmp_unbounded_int(v, u) != 1) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(u, u) != 0) result = false;
+	if(result && unbounded_int_cmp_unbounded_int(v, v) != 0) result = false;
+
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return 0;
+}
+
+bool test_uint_cmp_with_ll(void) {
+	unbounded_int u = string2unbounded_int("6404");
+	bool result = unbounded_int_cmp_ll(u, 3740) == 1;
+	if(result && unbounded_int_cmp_ll(u, -3740) != 1) result = false;
+	if(result && unbounded_int_cmp_ll(u, 73512) != -1) result = false;
+	if(result && unbounded_int_cmp_ll(u, 6404) != 0) result = false;
+	free_unbounded_int(&u);
+	return result;
+}
+
+bool test_uint_cmp_with_ll_2(void) {
+	unbounded_int u = string2unbounded_int("-3832");
+	bool result = unbounded_int_cmp_ll(u, 657) == -1;
+	if(result && unbounded_int_cmp_ll(u, -370) != -1) result = false;
+	if(result && unbounded_int_cmp_ll(u, -73512) != 1) result = false;
+	if(result && unbounded_int_cmp_ll(u, -3832) != 0) result = false;
+	free_unbounded_int(&u);
+	return result;
+}
