@@ -97,7 +97,7 @@ bool test_uint_cmp_with_uint_2(void) {
 
 	free_unbounded_int(&u);
 	free_unbounded_int(&v);
-	return 0;
+	return result;
 }
 
 bool test_uint_cmp_with_uint_3(void) {
@@ -111,7 +111,7 @@ bool test_uint_cmp_with_uint_3(void) {
 
 	free_unbounded_int(&u);
 	free_unbounded_int(&v);
-	return 0;
+	return result;
 }
 
 bool test_uint_cmp_with_ll(void) {
