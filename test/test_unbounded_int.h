@@ -37,4 +37,16 @@ extern bool test_uint_cmp_with_ll(void);
 
 extern bool test_uint_cmp_with_ll_2(void);
 
+// Test the sum of two unbounded int
+
+extern bool test_uint_sum(void);
+
+extern bool test_uint_sum_2(void);
+
+extern bool test_uint_sum_3(void);
+
+extern bool test_uint_sum_4(void);
+
+extern bool test_uint_sum_5(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

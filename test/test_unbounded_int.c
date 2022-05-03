@@ -133,3 +133,93 @@ bool test_uint_cmp_with_ll_2(void) {
 	free_unbounded_int(&u);
 	return result;
 }
+
+bool test_uint_sum(void) {
+	unbounded_int u = string2unbounded_int("478");
+	unbounded_int v = ZERO;
+
+	unbounded_int sum = unbounded_int_somme(u, v);
+	bool result = unbounded_int_cmp_ll(sum, 478) == 0;
+	if(result) {
+		free_unbounded_int(&sum);
+		sum = unbounded_int_somme(v, u);
+		result = unbounded_int_cmp_ll(sum, 478) == 0;
+	}
+
+	free_unbounded_int(&sum);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_sum_2(void) {
+	unbounded_int u = ZERO;
+	unbounded_int v = ZERO;
+
+	unbounded_int sum = unbounded_int_somme(u, v);
+	bool result = unbounded_int_cmp_ll(sum, 0) == 0;
+	if(result) {
+		free_unbounded_int(&sum);
+		sum = unbounded_int_somme(v, u);
+		result = unbounded_int_cmp_ll(sum, 0) == 0;
+	}
+
+	free_unbounded_int(&sum);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_sum_3(void) {
+	unbounded_int u = string2unbounded_int("-478");
+	unbounded_int v = ZERO;
+
+	unbounded_int sum = unbounded_int_somme(u, v);
+	bool result = unbounded_int_cmp_ll(sum, -478) == 0;
+	if(result) {
+		free_unbounded_int(&sum);
+		sum = unbounded_int_somme(v, u);
+		result = unbounded_int_cmp_ll(sum, -478) == 0;
+	}
+
+	free_unbounded_int(&sum);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_sum_4(void) {
+	unbounded_int u = string2unbounded_int("-478");
+	unbounded_int v = string2unbounded_int("-6632");
+
+	unbounded_int sum = unbounded_int_somme(u, v);
+	bool result = unbounded_int_cmp_ll(sum, -7110) == 0;
+	if(result) {
+		free_unbounded_int(&sum);
+		sum = unbounded_int_somme(v, u);
+		result = unbounded_int_cmp_ll(sum, -7110) == 0;
+	}
+
+	free_unbounded_int(&sum);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_sum_5(void) {
+	unbounded_int u = string2unbounded_int("478");
+	unbounded_int v = string2unbounded_int("-6632");
+
+	unbounded_int sum = unbounded_int_somme(u, v);
+	bool result = unbounded_int_cmp_ll(sum, -6154) == 0;
+	if(result) {
+		free_unbounded_int(&sum);
+		sum = unbounded_int_somme(v, u);
+		result = unbounded_int_cmp_ll(sum, -6154) == 0;
+	}
+
+	free_unbounded_int(&sum);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
