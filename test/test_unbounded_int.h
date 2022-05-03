@@ -19,4 +19,10 @@ extern bool test_create_uint_from_ll(void);
 
 extern bool test_create_uint_from_ll_2(void);
 
+// Test the creation of a string from an unbounded int
+
+extern bool test_create_string_from_uint(void);
+
+extern bool test_create_string_from_uint_2(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

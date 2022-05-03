@@ -1,3 +1,5 @@
+#include <string.h>
+#include <malloc.h>
 #include "test_unbounded_int.h"
 #include "unbounded_int.h"
 #include "strings.h"
@@ -49,5 +51,23 @@ bool test_create_uint_from_ll_2(void) {
 	unbounded_int u = ll2unbounded_int(-12);
 	bool result = !isNaN(u) && u.signe == '-' && uint_cmp_char(u, "12");
 	free_unbounded_int(&u);
+	return result;
+}
+
+bool test_create_string_from_uint(void) {
+	unbounded_int u = string2unbounded_int("924");
+	char *s = unbounded_int2string(u);
+	bool result = strcmp(s, "924") == 0;
+	free_unbounded_int(&u);
+	free(s);
+	return result;
+}
+
+bool test_create_string_from_uint_2(void) {
+	unbounded_int u = string2unbounded_int("-75486");
+	char *s = unbounded_int2string(u);
+	bool result = strcmp(s, "-75486") == 0;
+	free_unbounded_int(&u);
+	free(s);
 	return result;
 }
