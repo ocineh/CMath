@@ -59,4 +59,14 @@ extern bool test_uint_produit_3(void);
 
 extern bool test_uint_produit_4(void);
 
+// Test the power of an unbounded int by another unbounded int
+
+extern bool test_uint_pow(void);
+
+extern bool test_uint_pow_2(void);
+
+extern bool test_uint_pow_3(void);
+
+extern bool test_uint_pow_4(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

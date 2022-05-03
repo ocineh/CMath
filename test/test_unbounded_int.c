@@ -295,3 +295,75 @@ bool test_uint_produit_4(void) {
 	free_unbounded_int(&v);
 	return result;
 }
+
+bool test_uint_pow(void) {
+	unbounded_int u = string2unbounded_int("9");
+	unbounded_int v = string2unbounded_int("5");
+
+	unbounded_int pow = unbounded_int_pow(u, v);
+	bool result = unbounded_int_cmp_ll(pow, 59049) == 0;
+	if(result) {
+		free_unbounded_int(&pow);
+		pow = unbounded_int_pow(v, u);
+		result = unbounded_int_cmp_ll(pow, 1953125) == 0;
+	}
+
+	free_unbounded_int(&pow);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_pow_2(void) {
+	unbounded_int u = string2unbounded_int("0");
+	unbounded_int v = string2unbounded_int("243");
+
+	unbounded_int pow = unbounded_int_pow(u, v);
+	bool result = unbounded_int_cmp_ll(pow, 0) == 0;
+	if(result) {
+		free_unbounded_int(&pow);
+		pow = unbounded_int_pow(v, u);
+		result = unbounded_int_cmp_ll(pow, 1) == 0;
+	}
+
+	free_unbounded_int(&pow);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_pow_3(void) {
+	unbounded_int u = string2unbounded_int("-9");
+	unbounded_int v = string2unbounded_int("-3");
+
+	unbounded_int pow = unbounded_int_pow(u, v);
+	bool result = isNaN(pow);
+	if(result) {
+		free_unbounded_int(&pow);
+		pow = unbounded_int_pow(v, u);
+		result = isNaN(pow);
+	}
+
+	free_unbounded_int(&pow);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_pow_4(void) {
+	unbounded_int u = string2unbounded_int("-9");
+	unbounded_int v = string2unbounded_int("3");
+
+	unbounded_int pow = unbounded_int_pow(u, v);
+	bool result = unbounded_int_cmp_ll(pow, -729) == 0;
+	if(result) {
+		free_unbounded_int(&pow);
+		pow = unbounded_int_pow(v, u);
+		result = isNaN(pow);
+	}
+
+	free_unbounded_int(&pow);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
