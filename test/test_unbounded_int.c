@@ -223,3 +223,75 @@ bool test_uint_sum_5(void) {
 	free_unbounded_int(&v);
 	return result;
 }
+
+bool test_uint_produit(void) {
+	unbounded_int u = string2unbounded_int("478");
+	unbounded_int v = string2unbounded_int("6632");
+
+	unbounded_int prod = unbounded_int_produit(u, v);
+	bool result = unbounded_int_cmp_ll(prod, 3170096) == 0;
+	if(result) {
+		free_unbounded_int(&prod);
+		prod = unbounded_int_produit(v, u);
+		result = unbounded_int_cmp_ll(prod, 3170096) == 0;
+	}
+
+	free_unbounded_int(&prod);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_produit_2(void) {
+	unbounded_int u = string2unbounded_int("478");
+	unbounded_int v = ZERO;
+
+	unbounded_int prod = unbounded_int_produit(u, v);
+	bool result = unbounded_int_cmp_unbounded_int(prod, v) == 0;
+	if(result) {
+		free_unbounded_int(&prod);
+		prod = unbounded_int_produit(v, u);
+		result = unbounded_int_cmp_unbounded_int(prod, v) == 0;
+	}
+
+	free_unbounded_int(&prod);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_produit_3(void) {
+	unbounded_int u = string2unbounded_int("-478");
+	unbounded_int v = ZERO;
+
+	unbounded_int prod = unbounded_int_produit(u, v);
+	bool result = unbounded_int_cmp_unbounded_int(prod, v) == 0;
+	if(result) {
+		free_unbounded_int(&prod);
+		prod = unbounded_int_produit(v, u);
+		result = unbounded_int_cmp_unbounded_int(prod, v) == 0;
+	}
+
+	free_unbounded_int(&prod);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}
+
+bool test_uint_produit_4(void) {
+	unbounded_int u = string2unbounded_int("-478");
+	unbounded_int v = string2unbounded_int("-6632");
+
+	unbounded_int prod = unbounded_int_produit(u, v);
+	bool result = unbounded_int_cmp_ll(prod, 3170096) == 0;
+	if(result) {
+		free_unbounded_int(&prod);
+		prod = unbounded_int_produit(v, u);
+		result = unbounded_int_cmp_ll(prod, 3170096) == 0;
+	}
+
+	free_unbounded_int(&prod);
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	return result;
+}

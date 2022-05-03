@@ -49,4 +49,14 @@ extern bool test_uint_sum_4(void);
 
 extern bool test_uint_sum_5(void);
 
+// Test the product of two unbounded int
+
+extern bool test_uint_produit(void);
+
+extern bool test_uint_produit_2(void);
+
+extern bool test_uint_produit_3(void);
+
+extern bool test_uint_produit_4(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H
