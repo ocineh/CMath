@@ -54,7 +54,13 @@ unbounded_int string2unbounded_int(const char *e) {
 		} else if(isdigit(e[i])) result.signe = '+';
 		else return result;
 
-		while(i < len && isdigit(e[i])) add_chiffre(&result, e[i++]);
+		while(i < len) {
+			if(isdigit(e[i])) add_chiffre(&result, e[i++]);
+			else {
+				free_unbounded_int(&result);
+				return NaN;
+			}
+		}
 	}
 	return strip_unbounded_int(result);
 }
