@@ -277,10 +277,11 @@ unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
 }
 
 static void free_chiffre(chiffre *c) {
-	if(c != NULL) {
-		free_chiffre(c->suivant);
-		free(c);
-		c = NULL;
+	chiffre *actual = c;
+	while(actual != NULL) {
+		chiffre *tmp = actual;
+		actual = actual->suivant;
+		free(tmp);
 	}
 }
 
