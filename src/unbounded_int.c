@@ -374,7 +374,7 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 	return result;
 }
 
-unbounded_int unbounded_int_div(unbounded_int a, unbounded_int b) {
+unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b) {
 	if(isNaN(a) || isNaN(b) || isZERO(b)) return NaN;
 	if(isZERO(a)) return ZERO;
 	bool minus = a.signe != b.signe;

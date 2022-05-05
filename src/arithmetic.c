@@ -238,7 +238,7 @@ static node *evaluate_div(node *n) {
 			}
 		}
 		if(n->left->operator == NONE && n->right->operator == NONE) {
-			unbounded_int res = unbounded_int_div(n->left->operand, n->right->operand);
+			unbounded_int res = unbounded_int_quotient(n->left->operand, n->right->operand);
 			free_node(n);
 			return value_to_node(res);
 		}
