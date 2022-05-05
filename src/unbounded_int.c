@@ -307,6 +307,19 @@ static void left_shift(unbounded_int *u, long long unsigned n) {
 			add_chiffre(u, '0');
 }
 
+static void right_shift(unbounded_int *u, long long unsigned n) {
+	if(!isZERO((*u))) {
+		chiffre *actual = u->dernier;
+		while(n-- > 0 && actual != NULL) {
+			actual = actual->precedent;
+			--u->len;
+		}
+		free_chiffre(actual->suivant);
+		actual->suivant = NULL;
+		u->dernier = actual;
+	}
+}
+
 static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
 	if(a == NULL || isNaN((*a))) return NaN;
 	if(c->c == '0' || isZERO((*a))) return ZERO;
@@ -393,18 +406,35 @@ unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b) {
 	a.signe = b.signe = '+';
 	pas.signe = '-';
 
-	unbounded_int count = string2unbounded_int("0"), one = string2unbounded_int("1");
+	unbounded_int result = string2unbounded_int("0"), tmp, count;
 	while(unbounded_int_cmp_unbounded_int(a, b) >= 0) {
-		unbounded_int tmp = unbounded_int_somme(a, pas);
+		count = string2unbounded_int("1");
+		pas.signe = '+';
+		while(unbounded_int_cmp_unbounded_int(a, pas) >= 0) {
+			left_shift(&count, 1);
+			left_shift(&pas, 1);
+		}
+		if(unbounded_int_cmp_unbounded_int(a, pas) == -1) {
+			right_shift(&count, 1);
+			right_shift(&pas, 1);
+		}
+		pas.signe = '-';
+
+		tmp = unbounded_int_somme(a, pas);
 		free_unbounded_int(&a);
 		a = tmp;
 
-		tmp = unbounded_int_somme(count, one);
+		tmp = unbounded_int_somme(result, count);
 		free_unbounded_int(&count);
-		count = tmp;
+		free_unbounded_int(&result);
+		result = tmp;
+
+		tmp = copy_unbounded_int(&b);
+		free_unbounded_int(&pas);
+		pas = tmp;
 	}
-	count.signe = minus ? '-' : '+';
+	result.signe = minus ? '-' : '+';
 	free_unbounded_int(&a);
 	free_unbounded_int(&pas);
-	return count;
+	return result;
 }
