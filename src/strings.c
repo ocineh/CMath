@@ -66,26 +66,6 @@ char *substring(const char *s, size_t begin, size_t end) {
 	return new;
 }
 
-bool is_number(const char *s) {
-	size_t len = strlen(s);
-	if(len == 0) return false;
-	if(s[0] == '-' || s[0] == '+') {
-		if(len == 1) return false;
-		++s;
-		--len;
-	}
-	while(len-- > 0)
-		if(!isdigit(*(s++)))
-			return false;
-	return true;
-}
-
-int last_index_of(const char *s, char c) {
-	for(int i = (int) strlen(s) - 1; i >= 0; --i)
-		if(s[i] == c) return i;
-	return -1;
-}
-
 char *__concat__(char *s, ...) {
 	va_list args;
 	va_start(args, s);

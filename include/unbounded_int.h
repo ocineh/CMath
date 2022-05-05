@@ -5,9 +5,9 @@
 
 #define NaN ((unbounded_int){ .signe='*', .len=0, .premier=NULL, .dernier=NULL })
 #define ZERO (ll2unbounded_int(0))
-#define isZERO(x) (x.len == 1 && x.premier->c == '0')
-#define isONE(x) (x.len == 1 && x.premier->c == '1')
-#define isNaN(a) (a.signe == '*' || a.len == 0 || a.premier == NULL || a.dernier == NULL)
+#define isZERO(x) ((x).len == 1 && (x).premier->c == '0')
+#define isONE(x) ((x).len == 1 && (x).premier->c == '1')
+#define isNaN(a) ((a).signe == '*' || (a).len == 0 || (a).premier == NULL || (a).dernier == NULL)
 
 /**
  * @brief a structure representing an digit.
@@ -38,13 +38,6 @@ typedef struct unbounded_int {
  * @param a an unbounded_int
  */
 extern void free_unbounded_int(unbounded_int *a);
-
-/**
- * Print the digits composing an unbounded_int.
- *
- * @param u an instance of unbounded_int
- */
-extern void print_unbounded_int(unbounded_int *u);
 
 /**
  * Create an unbounded_int instance from a string.

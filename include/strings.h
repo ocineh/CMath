@@ -20,15 +20,6 @@ extern size_t strlen(const char *s);
 extern char *strip(char *c);
 
 /**
- * Split the elements of the string with the separator
- *
- * @param line a string
- * @param separator a separator
- * @return an array of strings
- */
-extern size_t split(char *line, char separator, char ***tokens);
-
-/**
  * Get the index of the first occurrence of the character in the string
  *
  * @param s a string
@@ -36,15 +27,6 @@ extern size_t split(char *line, char separator, char ***tokens);
  * @return an index in the string or -1 if not found
  */
 extern int index_of(const char *s, char c);
-
-/**
- * Get the index of the last occurrence of the character in the string
- *
- * @param s a string
- * @param c a character
- * @return an index in the string or -1 if not found
- */
-extern int last_index_of(const char *s, char c);
 
 /**
  * Get the substring from the string
@@ -55,14 +37,6 @@ extern int last_index_of(const char *s, char c);
  * @return the substring
  */
 extern char *substring(const char *s, size_t begin, size_t end);
-
-/**
- * Returns if the string is a number
- *
- * @param s a string
- * @return true if the string is a number
- */
-extern bool is_number(const char *s);
 
 extern char *__concat__(char *s, ...);
 #define concat(...) __concat__(__VA_ARGS__, NULL)

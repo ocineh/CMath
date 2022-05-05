@@ -307,7 +307,7 @@ static void left_shift(unbounded_int *u, long long unsigned n) {
 }
 
 static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
-	if(a == NULL || isNaN((*a)) || c == NULL) return NaN;
+	if(a == NULL || isNaN((*a))) return NaN;
 	if(c->c == '0' || isZERO((*a))) return ZERO;
 	if(c->c == '1') return copy_unbounded_int(a);
 
