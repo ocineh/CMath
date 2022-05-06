@@ -75,4 +75,12 @@ extern bool test_uint_pow_4(void);
 
 extern bool test_uint_pow_5(void);
 
+// Test the quotient of an unbounded int by another unbounded int
+
+extern bool test_uint_quotient_1(void);
+extern bool test_uint_quotient_2(void);
+extern bool test_uint_quotient_3(void);
+extern bool test_uint_quotient_4(void);
+extern bool test_uint_quotient_5(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

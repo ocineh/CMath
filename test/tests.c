@@ -3,7 +3,7 @@
 #include <time.h>
 #include "test_unbounded_int.h"
 
-#define NUMBER_OF_TESTS 29
+#define NUMBER_OF_TESTS 34
 static int test_count = 0;
 
 static void test(bool (*f)(void), const char *msg) {
@@ -57,5 +57,12 @@ int main(void) {
 	test(test_uint_pow_3, "Test the power of a positive and a negative number");
 	test(test_uint_pow_4, "Test the power of two negative numbers");
 	test(test_uint_pow_5, "Test the power of a negative and a positive number");
+
+	printf("\nTest the quotient of an unbounded int with another unbounded int\n");
+	test(test_uint_quotient_1, "Test with a number and zero");
+	test(test_uint_quotient_2, "Test with two positive numbers");
+	test(test_uint_quotient_3, "Test with two negative numbers");
+	test(test_uint_quotient_4, "Test with a negative and a positive number");
+	test(test_uint_quotient_5, "Test with a positive and a negative number");
 	return 0;
 }
