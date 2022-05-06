@@ -384,15 +384,14 @@ static unbounded_int unbounded_int_division(unbounded_int a, unbounded_int b, bo
 	unbounded_int pas = copy_unbounded_int(&b);
 	remain.signe = b.signe = '+';
 
-	unbounded_int quotient = string2unbounded_int("0"), tmp, count;
+	unbounded_int count = string2unbounded_int("1");
+	left_shift(&count, remain.len - pas.len);
+	left_shift(&pas, remain.len - pas.len);
+
+	unbounded_int quotient = string2unbounded_int("0"), tmp;
 	while(unbounded_int_cmp_unbounded_int(remain, b) >= 0) {
-		count = string2unbounded_int("1");
 		pas.signe = '+';
-		while(unbounded_int_cmp_unbounded_int(remain, pas) >= 0) {
-			left_shift(&count, 1);
-			left_shift(&pas, 1);
-		}
-		if(unbounded_int_cmp_unbounded_int(remain, pas) == -1) {
+		while(unbounded_int_cmp_unbounded_int(remain, pas) == -1) {
 			right_shift(&count, 1);
 			right_shift(&pas, 1);
 		}
@@ -403,20 +402,16 @@ static unbounded_int unbounded_int_division(unbounded_int a, unbounded_int b, bo
 		remain = tmp;
 
 		tmp = unbounded_int_somme(quotient, count);
-		free_unbounded_int(&count);
 		free_unbounded_int(&quotient);
 		quotient = tmp;
-
-		tmp = copy_unbounded_int(&b);
-		free_unbounded_int(&pas);
-		pas = tmp;
 	}
 
 	quotient.signe = minus ? '-' : '+';
 	if(isZERO(remain)) remain.signe = '+';
 	else remain.signe = a.signe;
-
 	unbounded_int result = copy_unbounded_int(modulo ? &remain : &quotient);
+
+	free_unbounded_int(&count);
 	free_unbounded_int(&quotient);
 	free_unbounded_int(&remain);
 	free_unbounded_int(&pas);
