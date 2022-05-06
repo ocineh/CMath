@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-static void add_chiffre(unbounded_int *u, char n) {
+static void push_back(unbounded_int *u, char n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
 	p_chiffre->c = n;
 	p_chiffre->precedent = NULL;
@@ -17,6 +17,38 @@ static void add_chiffre(unbounded_int *u, char n) {
 		u->dernier->suivant = p_chiffre;
 		u->dernier = p_chiffre;
 	}
+}
+
+static short ctoi(const char c) {
+	return c - '0';
+}
+
+static char itoc(short i) {
+	i = abs(i);
+	if(i < 0 || i > 9) return '\0';
+	return '0' + i;
+}
+
+static int cpm(char a, char b) {
+	short i = ctoi(a), j = ctoi(b);
+	if(i < j) return -1;
+	if(i > j) return 1;
+	return 0;
+}
+
+static void push_front(unbounded_int *u, short n) {
+	chiffre *p_chiffre = malloc(sizeof(chiffre));
+	p_chiffre->c = itoc(n);
+	p_chiffre->suivant = p_chiffre->precedent = NULL;
+
+	if(u->premier == NULL) {
+		u->premier = u->dernier = p_chiffre;
+	} else {
+		p_chiffre->suivant = u->premier;
+		u->premier->precedent = p_chiffre;
+		u->premier = p_chiffre;
+	}
+	++u->len;
 }
 
 static unbounded_int strip_unbounded_int(unbounded_int u) {
@@ -55,7 +87,7 @@ unbounded_int string2unbounded_int(const char *e) {
 		else return result;
 
 		while(i < len) {
-			if(isdigit(e[i])) add_chiffre(&result, e[i++]);
+			if(isdigit(e[i])) push_back(&result, e[i++]);
 			else {
 				free_unbounded_int(&result);
 				return NaN;
@@ -95,45 +127,6 @@ char *unbounded_int2string(unbounded_int i) {
 	return res;
 }
 
-static short ctoi(const char c) {
-	switch(c) {
-		case '0': return 0;
-		case '1': return 1;
-		case '2': return 2;
-		case '3': return 3;
-		case '4': return 4;
-		case '5': return 5;
-		case '6': return 6;
-		case '7': return 7;
-		case '8': return 8;
-		case '9': return 9;
-		default: return -1;
-	}
-}
-
-static char itoc(const short i) {
-	switch(abs(i)) {
-		case 0: return '0';
-		case 1: return '1';
-		case 2: return '2';
-		case 3: return '3';
-		case 4: return '4';
-		case 5: return '5';
-		case 6: return '6';
-		case 7: return '7';
-		case 8: return '8';
-		case 9: return '9';
-		default: return '*';
-	}
-}
-
-static int cpm(char a, char b) {
-	short i = ctoi(a), j = ctoi(b);
-	if(i < j) return -1;
-	if(i > j) return 1;
-	return 0;
-}
-
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 	if(a.signe == '-' && b.signe == '+') return -1;
 	if(a.signe == '+' && b.signe == '-') return 1;
@@ -153,33 +146,15 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 	return 0;
 }
 
-static int cmp_abs(unbounded_int *a, unbounded_int *b) {
-	char tmp_a = a->signe, tmp_b = b->signe;
-	a->signe = b->signe = '+';
-	int tmp = unbounded_int_cmp_unbounded_int(*a, *b);
-	a->signe = tmp_a;
-	b->signe = tmp_b;
+static int cmp_abs(unbounded_int a, unbounded_int b) {
+	a.signe = b.signe = '+';
+	int tmp = unbounded_int_cmp_unbounded_int(a, b);
 	return tmp;
 }
 
 int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
 	unbounded_int tmp = ll2unbounded_int(b);
 	return unbounded_int_cmp_unbounded_int(a, tmp);
-}
-
-static void add_begin(unbounded_int *u, short n) {
-	chiffre *p_chiffre = malloc(sizeof(chiffre));
-	p_chiffre->c = itoc(n);
-	p_chiffre->suivant = p_chiffre->precedent = NULL;
-
-	if(u->premier == NULL) {
-		u->premier = u->dernier = p_chiffre;
-	} else {
-		p_chiffre->suivant = u->premier;
-		u->premier->precedent = p_chiffre;
-		u->premier = p_chiffre;
-	}
-	++u->len;
 }
 
 static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
@@ -192,7 +167,7 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 			tmp = ctoi(p_a->c) + ctoi(p_b->c) + hold;
 			hold = tmp / 10;
 			tmp %= 10;
-			add_begin(&r, tmp);
+			push_front(&r, tmp);
 			p_a = p_a->precedent;
 			p_b = p_b->precedent;
 		}
@@ -202,11 +177,11 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 			tmp = ctoi(p->c) + hold;
 			hold = tmp / 10;
 			tmp %= 10;
-			add_begin(&r, tmp);
+			push_front(&r, tmp);
 			p = p->precedent;
 		}
 
-		if(hold != 0) add_begin(&r, hold);
+		if(hold != 0) push_front(&r, hold);
 		return r;
 	}
 	return NaN;
@@ -214,8 +189,12 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 
 static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe != b->signe) {
-		unbounded_int r = { .signe= (char) (cmp_abs(a, b) == 1 ? a->signe
-															   : b->signe), .len=0, .premier=NULL, .dernier=NULL };
+		unbounded_int r = {
+				.signe= (char) (cmp_abs(*a, *b) == 1 ? a->signe : b->signe),
+				.len=0,
+				.premier=NULL,
+				.dernier=NULL
+		};
 		short hold = 0, tmp;
 
 		chiffre *p_a = a->dernier, *p_b = b->dernier;
@@ -229,7 +208,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 
 			hold = tmp / 10;
 			tmp %= 10;
-			add_begin(&r, tmp);
+			push_front(&r, tmp);
 			p_a = p_a->precedent;
 			p_b = p_b->precedent;
 		}
@@ -241,11 +220,11 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 			else tmp = i + hold;
 			hold = tmp / 10;
 			tmp %= 10;
-			add_begin(&r, tmp);
+			push_front(&r, tmp);
 			p = p->precedent;
 		}
 
-		if(hold != 0) add_begin(&r, hold);
+		if(hold != 0) push_front(&r, hold);
 		return r;
 	}
 	return NaN;
@@ -256,7 +235,7 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	if(isZERO(a)) return copy_unbounded_int(&b);
 	if(isZERO(b)) return copy_unbounded_int(&a);
 
-	int cmp = cmp_abs(&a, &b);
+	int cmp = cmp_abs(a, b);
 	if(a.signe != b.signe && cmp == 0) return ZERO;
 
 	if(a.signe == b.signe) return strip_unbounded_int(add_same_sign(&a, &b));
@@ -297,14 +276,14 @@ unbounded_int copy_unbounded_int(unbounded_int *a) {
 	if(a == NULL) return NaN;
 	unbounded_int result = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
 	for(chiffre *actual = a->premier; actual != NULL; actual = actual->suivant)
-		add_chiffre(&result, actual->c);
+		push_back(&result, actual->c);
 	return result;
 }
 
 static void left_shift(unbounded_int *u, long long unsigned n) {
 	if(!isZERO((*u)))
 		while(n-- > 0)
-			add_chiffre(u, '0');
+			push_back(u, '0');
 }
 
 static void right_shift(unbounded_int *u, long long unsigned n) {
@@ -333,11 +312,11 @@ static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
 	while(c_a != NULL) {
 		res = ctoi(c_a->c) * coef + hold;
 		hold = res / 10;
-		add_begin(&result, res % 10);
+		push_front(&result, res % 10);
 		c_a = c_a->precedent;
 	}
 
-	if(hold != 0) add_begin(&result, hold);
+	if(hold != 0) push_front(&result, hold);
 	return result;
 }
 
@@ -388,7 +367,7 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 	return result;
 }
 
-static unbounded_int unbounded_int_(unbounded_int a, unbounded_int b, bool modulo) {
+static unbounded_int unbounded_int_division(unbounded_int a, unbounded_int b, bool modulo) {
 	if(isNaN(a) || isNaN(b) || isZERO(b)) return NaN;
 	if(isZERO(a)) return ZERO;
 	if(isONE(b)) {
@@ -397,7 +376,7 @@ static unbounded_int unbounded_int_(unbounded_int a, unbounded_int b, bool modul
 	}
 
 	bool minus = a.signe != b.signe;
-	int cmp = cmp_abs(&a, &b);
+	int cmp = cmp_abs(a, b);
 	if(cmp == -1) return modulo ? copy_unbounded_int(&a) : ZERO;
 	if(cmp == 0) return modulo ? ZERO : string2unbounded_int(minus ? "-1" : "1");
 
@@ -445,9 +424,9 @@ static unbounded_int unbounded_int_(unbounded_int a, unbounded_int b, bool modul
 }
 
 unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b) {
-	return unbounded_int_(a, b, false);
+	return unbounded_int_division(a, b, false);
 }
 
 unbounded_int unbounded_int_modulo(unbounded_int a, unbounded_int b) {
-	return unbounded_int_(a, b, true);
+	return unbounded_int_division(a, b, true);
 }
