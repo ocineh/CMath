@@ -388,53 +388,66 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 	return result;
 }
 
-unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b) {
+static unbounded_int unbounded_int_(unbounded_int a, unbounded_int b, bool modulo) {
 	if(isNaN(a) || isNaN(b) || isZERO(b)) return NaN;
 	if(isZERO(a)) return ZERO;
-	bool minus = a.signe != b.signe;
 	if(isONE(b)) {
-		a = copy_unbounded_int(&a);
-		a.signe = minus ? '-' : '+';
-		return a;
+		if(b.signe == '-') a.signe = '-';
+		return modulo ? ZERO : copy_unbounded_int(&a);
 	}
+
+	bool minus = a.signe != b.signe;
 	int cmp = cmp_abs(&a, &b);
-	if(cmp == -1) return ZERO;
-	if(cmp == 0) return string2unbounded_int(minus ? "-1" : "1");
+	if(cmp == -1) return modulo ? copy_unbounded_int(&a) : ZERO;
+	if(cmp == 0) return modulo ? ZERO : string2unbounded_int(minus ? "-1" : "1");
 
-	a = copy_unbounded_int(&a);
+	unbounded_int remain = copy_unbounded_int(&a);
 	unbounded_int pas = copy_unbounded_int(&b);
-	a.signe = b.signe = '+';
-	pas.signe = '-';
+	remain.signe = b.signe = '+';
 
-	unbounded_int result = string2unbounded_int("0"), tmp, count;
-	while(unbounded_int_cmp_unbounded_int(a, b) >= 0) {
+	unbounded_int quotient = string2unbounded_int("0"), tmp, count;
+	while(unbounded_int_cmp_unbounded_int(remain, b) >= 0) {
 		count = string2unbounded_int("1");
 		pas.signe = '+';
-		while(unbounded_int_cmp_unbounded_int(a, pas) >= 0) {
+		while(unbounded_int_cmp_unbounded_int(remain, pas) >= 0) {
 			left_shift(&count, 1);
 			left_shift(&pas, 1);
 		}
-		if(unbounded_int_cmp_unbounded_int(a, pas) == -1) {
+		if(unbounded_int_cmp_unbounded_int(remain, pas) == -1) {
 			right_shift(&count, 1);
 			right_shift(&pas, 1);
 		}
 		pas.signe = '-';
 
-		tmp = unbounded_int_somme(a, pas);
-		free_unbounded_int(&a);
-		a = tmp;
+		tmp = unbounded_int_somme(remain, pas);
+		free_unbounded_int(&remain);
+		remain = tmp;
 
-		tmp = unbounded_int_somme(result, count);
+		tmp = unbounded_int_somme(quotient, count);
 		free_unbounded_int(&count);
-		free_unbounded_int(&result);
-		result = tmp;
+		free_unbounded_int(&quotient);
+		quotient = tmp;
 
 		tmp = copy_unbounded_int(&b);
 		free_unbounded_int(&pas);
 		pas = tmp;
 	}
-	result.signe = minus ? '-' : '+';
-	free_unbounded_int(&a);
+
+	quotient.signe = minus ? '-' : '+';
+	if(isZERO(remain)) remain.signe = '+';
+	else remain.signe = a.signe;
+
+	unbounded_int result = copy_unbounded_int(modulo ? &remain : &quotient);
+	free_unbounded_int(&quotient);
+	free_unbounded_int(&remain);
 	free_unbounded_int(&pas);
 	return result;
+}
+
+unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b) {
+	return unbounded_int_(a, b, false);
+}
+
+unbounded_int unbounded_int_modulo(unbounded_int a, unbounded_int b) {
+	return unbounded_int_(a, b, true);
 }

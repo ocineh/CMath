@@ -134,4 +134,6 @@ extern unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n);
 
 extern unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b);
 
+extern unbounded_int unbounded_int_modulo(unbounded_int a, unbounded_int b);
+
 #endif //PROJET_UNBOUNDED_INT_H
