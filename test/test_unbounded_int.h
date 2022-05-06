@@ -83,4 +83,12 @@ extern bool test_uint_quotient_3(void);
 extern bool test_uint_quotient_4(void);
 extern bool test_uint_quotient_5(void);
 
+// Test the modulo of an unbounded int by another unbounded int
+
+extern bool test_uint_modulo_1(void);
+extern bool test_uint_modulo_2(void);
+extern bool test_uint_modulo_3(void);
+extern bool test_uint_modulo_4(void);
+extern bool test_uint_modulo_5(void);
+
 #endif //PROJET_TEST_UNBOUNDED_INT_H

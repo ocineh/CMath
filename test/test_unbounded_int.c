@@ -374,3 +374,53 @@ bool test_uint_quotient_5(void) {
 			return false;
 	return true;
 }
+
+static bool test_uint_modulo(long long a, long long b) {
+	unbounded_int u = ll2unbounded_int(a);
+	unbounded_int v = ll2unbounded_int(b);
+
+	unbounded_int modulo = unbounded_int_modulo(u, v);
+	bool result;
+	if(b != 0) {
+		unbounded_int w = ll2unbounded_int(a % b);
+		result = unbounded_int_cmp_unbounded_int(modulo, w) == 0;
+		free_unbounded_int(&w);
+	} else result = isNaN(modulo);
+
+	free_unbounded_int(&modulo);
+	free_unbounded_int(&v);
+	free_unbounded_int(&u);
+	return result;
+}
+
+bool test_uint_modulo_1(void) {
+	return test_uint_modulo(POSITIVE, 0) && test_uint_modulo(NEGATIVE, 0);
+}
+
+bool test_uint_modulo_2(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_modulo(POSITIVE, POSITIVE))
+			return false;
+	return true;
+}
+
+bool test_uint_modulo_3(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_modulo(NEGATIVE, NEGATIVE))
+			return false;
+	return true;
+}
+
+bool test_uint_modulo_4(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_modulo(NEGATIVE, POSITIVE))
+			return false;
+	return true;
+}
+
+bool test_uint_modulo_5(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_modulo(POSITIVE, NEGATIVE))
+			return false;
+	return true;
+}

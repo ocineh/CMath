@@ -64,5 +64,12 @@ int main(void) {
 	test(test_uint_quotient_3, "Test with two negative numbers");
 	test(test_uint_quotient_4, "Test with a negative and a positive number");
 	test(test_uint_quotient_5, "Test with a positive and a negative number");
+
+	printf("\nTest the modulo of an unbounded int with another unbounded int\n");
+	test(test_uint_modulo_1, "Test with a number and zero");
+	test(test_uint_modulo_2, "Test with two positive numbers");
+	test(test_uint_modulo_3, "Test with two negative numbers");
+	test(test_uint_modulo_4, "Test with a negative and a positive number");
+	test(test_uint_modulo_5, "Test with a positive and a negative number");
 	return 0;
 }

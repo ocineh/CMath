@@ -1,4 +1,4 @@
-add_executable(test-library tests.c)
+add_executable(test-library tests.c test_unbounded_int.c)
 
 target_compile_features(test-library PUBLIC c_std_11)
 
