@@ -154,7 +154,9 @@ static int cmp_abs(unbounded_int a, unbounded_int b) {
 
 int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
 	unbounded_int tmp = ll2unbounded_int(b);
-	return unbounded_int_cmp_unbounded_int(a, tmp);
+	int result = unbounded_int_cmp_unbounded_int(a, tmp);
+	free_unbounded_int(&tmp);
+	return result;
 }
 
 static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {

@@ -33,25 +33,6 @@ static char *extract(char *s, size_t begin, size_t end) {
 	return new;
 }
 
-size_t split(char *line, char separator, char ***tokens) {
-	size_t count = 1, len = strlen(line);
-	for(size_t i = 0; i < len; ++i) {
-		if(line[i] == separator) {
-			size_t j = i + 1;
-			while(j < len && line[j] != separator) ++j;
-			if(i != j - 1) ++count;
-			i = j - 1;
-		}
-	}
-
-	*tokens = malloc(sizeof(char *) * count);
-	for(size_t i = 0, j = i, k = 0; i < len && k < count; i = j + 1, j = i) {
-		while(line[j] != separator && j < len) j++;
-		if(i != j) (*tokens)[k++] = extract(line, i, j - 1);
-	}
-	return count;
-}
-
 int index_of(const char *s, char c) {
 	size_t len = strlen(s);
 	for(int i = 0; i < len; ++i)

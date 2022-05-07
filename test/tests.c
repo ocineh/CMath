@@ -3,7 +3,7 @@
 #include <time.h>
 #include "test_unbounded_int.h"
 
-#define NUMBER_OF_TESTS 34
+#define NUMBER_OF_TESTS 39
 static int test_count = 0;
 
 static void test(bool (*f)(void), const char *msg) {

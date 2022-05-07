@@ -5,10 +5,8 @@
 
 static bool uint_cmp_char(unbounded_int u, char *s) {
 	if(*s == '-') ++s;
-	size_t len = strlen(s);
-	if(len != u.len) return false;
 	chiffre *p = u.premier;
-	while(p != NULL) {
+	while(p != NULL && *s != '\0') {
 		if(p->c != *s) return false;
 		p = p->suivant;
 		s++;
@@ -28,13 +26,14 @@ static size_t len(long long n) {
 	size_t len = 0;
 	while(n != 0)
 		n /= 10, ++len;
-	return len + (n < 0);
+	return len + 1;
 }
 
 static bool test_create_uint_from_string(long long n) {
 	char *s = malloc(len(n) + 1);
+	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
-	char signe = s[0] == '-' ? '-' : '+';
+	char signe = (*s) == '-' ? '-' : '+';
 
 	unbounded_int u = string2unbounded_int(s);
 	bool result = !isNaN(u) && u.signe == signe && uint_cmp_char(u, s);
@@ -76,6 +75,7 @@ bool test_create_uint_from_ll_1(void) {
 bool test_create_uint_from_ll_2(void) {
 	long long n = NEGATIVE;
 	char *s = malloc(len(n) + 1);
+	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 
 	unbounded_int u = ll2unbounded_int(n);
@@ -87,6 +87,7 @@ bool test_create_uint_from_ll_2(void) {
 
 static bool test_create_string_from_uint(long long n) {
 	char *s = malloc(len(n) + 1);
+	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 
 	unbounded_int u = ll2unbounded_int(n);
