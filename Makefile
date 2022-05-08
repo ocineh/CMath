@@ -25,13 +25,13 @@ build/library.a: $(OBJECT_FILES)
 build/tests: build/library.a $(wildcard test/*.c)
 	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c test/test_unbounded_int.h build/library.a
 
-build/app: build/library.a
-	$(COMPILE) -o build/app app/main.c build/library.a
+build/cli: build/library.a
+	$(COMPILE) -o build/cli cli/main.c build/library.a
 
 library: build/library.a
 test: build/tests
 	./build/tests
-build: build/app
+build: build/cli
 
 clean:
 	rm -rf build

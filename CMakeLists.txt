@@ -9,7 +9,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory(src)
 
 # The executable code is here
-add_subdirectory(app)
+add_subdirectory(cli)
 
 # The test are here
 include(CTest)
