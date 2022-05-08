@@ -75,13 +75,13 @@ static void destroy_memory(memory *mem) {
 	free(mem);
 }
 
-void destroy_interpreter(interpreter *interpreter) {
-	if(interpreter == NULL) return;
-	destroy_memory(interpreter->memory);
-	fclose(interpreter->input);
-	fclose(interpreter->output);
-	fclose(interpreter->error);
-	free(interpreter);
+void destroy_interpreter(interpreter *inter) {
+	if(inter == NULL) return;
+	destroy_memory(inter->memory);
+	fclose(inter->input);
+	fclose(inter->output);
+	fclose(inter->error);
+	free(inter);
 }
 
 bool valid_variable_name(char *name) {
@@ -130,12 +130,12 @@ unbounded_int *value_of(memory *mem, char *name) {
 	return NULL;
 }
 
-void print(interpreter *interpreter, char *name) {
-	unbounded_int *u = value_of(interpreter->memory, name);
-	if(u == NULL) fprintf(interpreter->error, "Variable %s not found.\n", name);
+void print(interpreter *inter, char *name) {
+	unbounded_int *u = value_of(inter->memory, name);
+	if(u == NULL) fprintf(inter->error, "Variable %s not found.\n", name);
 	else {
 		char *str = unbounded_int2string(*u);
-		fprintf(interpreter->output, "%s = %s\n", name, str);
+		fprintf(inter->output, "%s = %s\n", name, str);
 		free(str);
 	}
 }
@@ -204,8 +204,8 @@ void interpret(interpreter *inter) {
 		if(fgets(buffer, 1024, inter->input) == NULL) break;
 		if(is_empty(buffer) || buffer[0] == '#') continue;
 
-		int pos = index_of(buffer, '=');
-		if(pos != -1) { // Assignment
+		size_t pos;
+		if(index_of(buffer, '=', &pos)) { // Assignment
 			// Parse
 			char *name = strip(tmp = substring(buffer, 0, pos));
 			free(tmp);
@@ -231,8 +231,7 @@ void interpret(interpreter *inter) {
 			free(value);
 		} else if(strstr(buffer, "exit") != NULL) break;
 		else {
-			pos = index_of(buffer, ' ');
-			if(pos != -1) {
+			if(index_of(buffer, ' ', &pos)) {
 				char *command = strip(tmp = substring(buffer, 0, pos));
 				free(tmp);
 				if(strcmp(command, "print") == 0) {

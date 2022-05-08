@@ -12,6 +12,7 @@ size_t strlen(const char *s) {
 }
 
 char *strip(char *c) {
+	if(!c) return NULL;
 	size_t begin = 0;
 	while(isspace(c[begin])) begin++;
 
@@ -26,22 +27,20 @@ char *strip(char *c) {
 	return new;
 }
 
-static char *extract(char *s, size_t begin, size_t end) {
-	size_t len = end - begin + 1;
-	char *new = malloc(len);
-	memmove(new, s + begin, len);
-	return new;
-}
-
-int index_of(const char *s, char c) {
+bool index_of(const char *s, char c, size_t *index) {
 	size_t len = strlen(s);
-	for(int i = 0; i < len; ++i)
-		if(s[i] == c) return i;
-	return -1;
+	for(size_t i = 0; i < len; ++i)
+		if(s[i] == c) {
+			if(index) *index = i;
+			return true;
+		}
+	return false;
 }
 
 char *substring(const char *s, size_t begin, size_t end) {
+	if(begin > end) return NULL;
 	char *new = malloc(end - begin + 1);
+	if(!new) return NULL;
 	memmove(new, s + begin, end - begin + 1);
 	new[end - begin] = '\0';
 	return new;
@@ -97,7 +96,7 @@ char *remove_spaces(char *s) {
 	while(*tmp != '\0') if(!isspace(*(tmp++))) ++len;
 
 	char *res = malloc(len + 1);
-	for(int j = 0, i = 0; j < len; ++j) {
+	for(size_t j = 0, i = 0; j < len; ++j) {
 		while(isspace(s[i])) ++i;
 		res[j] = s[i++];
 	}

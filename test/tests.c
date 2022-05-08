@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "test_unbounded_int.h"
+#include "unbounded_int.h"
 
 #define NUMBER_OF_TESTS 39
 static int test_count = 0;
@@ -12,7 +13,7 @@ static void test(bool (*f)(void), const char *msg) {
 }
 
 int main(void) {
-	srand(time(NULL));
+	srand((unsigned) time(NULL));
 	printf("========================= Testing unbounded int =========================\n\n");
 
 	printf("Test the creation of an unbounded int\n");

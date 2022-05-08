@@ -19,24 +19,21 @@ static void push_back(unbounded_int *u, char n) {
 	}
 }
 
-static short ctoi(const char c) {
+static int ctoi(const char c) {
 	return c - '0';
 }
 
-static char itoc(short i) {
-	i = abs(i);
-	if(i < 0 || i > 9) return '\0';
-	return '0' + i;
+static char itoc(int i) {
+	return (char) (abs(i) + '0');
 }
 
 static int cpm(char a, char b) {
-	short i = ctoi(a), j = ctoi(b);
-	if(i < j) return -1;
-	if(i > j) return 1;
-	return 0;
+	int i = ctoi(a), j = ctoi(b);
+	if(i == -1 || j == -1) return -2;
+	return i < j ? -1 : i > j ? 1 : 0;
 }
 
-static void push_front(unbounded_int *u, short n) {
+static void push_front(unbounded_int *u, int n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
 	p_chiffre->c = itoc(n);
 	p_chiffre->suivant = p_chiffre->precedent = NULL;
@@ -117,7 +114,7 @@ char *unbounded_int2string(unbounded_int i) {
 	size_t len = i.len + (i.signe == '-') + 1;
 	char *res = malloc(sizeof(char) * len);
 	res[len - 1] = '\0';
-	int j = 0;
+	size_t j = 0;
 	if(i.signe == '-') res[j++] = '-';
 	chiffre *p_chiffre = i.premier;
 	while(j <= i.len && p_chiffre != NULL) {
@@ -162,7 +159,7 @@ int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
 static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe == b->signe) {
 		unbounded_int r = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
-		short hold = 0, tmp;
+		int hold = 0, tmp;
 
 		chiffre *p_a = a->dernier, *p_b = b->dernier;
 		while(p_a != NULL && p_b != NULL) {
@@ -191,17 +188,13 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 
 static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe != b->signe) {
-		unbounded_int r = {
-				.signe= (char) (cmp_abs(*a, *b) == 1 ? a->signe : b->signe),
-				.len=0,
-				.premier=NULL,
-				.dernier=NULL
-		};
-		short hold = 0, tmp;
+		unbounded_int r = NaN;
+		r.signe = (cmp_abs(*a, *b) == 1 ? a : b)->signe;
+		int hold = 0, tmp;
 
 		chiffre *p_a = a->dernier, *p_b = b->dernier;
 		while(p_a != NULL && p_b != NULL) {
-			short i = ctoi(p_a->c), j = ctoi(p_b->c);
+			int i = ctoi(p_a->c), j = ctoi(p_b->c);
 			if(i == j) {
 				if(hold < 0) tmp = -10 - (10 - ((j + abs(hold)) - i));
 				else tmp = hold;
@@ -217,7 +210,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 
 		chiffre *p = p_a == NULL ? p_b : p_a;
 		while(p != NULL) {
-			short i = ctoi(p->c);
+			int i = ctoi(p->c);
 			if(hold < 0 && -hold > i) tmp = -10 - (10 - (abs(hold) - i));
 			else tmp = i + hold;
 			hold = tmp / 10;
@@ -306,11 +299,11 @@ static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
 	if(c->c == '0' || isZERO((*a))) return ZERO;
 	if(c->c == '1') return copy_unbounded_int(a);
 
-	const short coef = ctoi(c->c);
+	const int coef = ctoi(c->c);
 	unbounded_int result = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
 
 	chiffre *c_a = a->dernier;
-	short res, hold = 0;
+	int res, hold = 0;
 	while(c_a != NULL) {
 		res = ctoi(c_a->c) * coef + hold;
 		hold = res / 10;

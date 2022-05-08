@@ -17,7 +17,7 @@ help:
 
 build/%.o: src/%.c include/%.h
 	@mkdir -p build
-	@$(COMPILE) -c $< -o $@
+	$(COMPILE) -c $< -o $@
 
 build/library.a: $(OBJECT_FILES)
 	ar -rcs build/library.a $(OBJECT_FILES)

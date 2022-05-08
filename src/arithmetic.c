@@ -77,35 +77,34 @@ static operator char_to_operator(char c) {
 
 #define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^')
 
-static bool is_unary_operator(char *s, int i) {
+static bool is_unary_operator(char *s, size_t i) {
 	return (s[i] == '+' || s[i] == '-') && (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
 }
 
-static int next_operator(char *s, char c) {
+static bool next_operator(char *s, char c, size_t *index) {
 	size_t len = strlen(s);
-	for(int i = 0; i < len; ++i)
-		if(s[i] == c && !(is_unary_operator(s, i))) return i;
-	return -1;
+	for(size_t i = 0; i < len; ++i)
+		if(s[i] == c && !(is_unary_operator(s, i))) {
+			if(index != NULL) *index = i;
+			return true;
+		}
+	return false;
 }
 
 static node *string_to_node(char *str) {
 	str = strip(str);
 	size_t len = strlen(str);
 
-	int pos = next_operator(str, '+');
-	if(pos == -1) pos = next_operator(str, '-');
-	if(pos == -1) pos = next_operator(str, '*');
-	if(pos == -1) pos = next_operator(str, '/');
-	if(pos == -1) pos = next_operator(str, '^');
-
-	if(pos == -1) {
+	size_t pos;
+	if(!next_operator(str, '+', &pos) && !next_operator(str, '*', &pos) &&
+	   !next_operator(str, '/', &pos) && !next_operator(str, '^', &pos)) {
 		unbounded_int value = string2unbounded_int(str);
 		free(str);
 		return value_to_node(value);
 	}
 
-	char *left = strip_free(substring(str, 0, pos));
-	char *right = strip_free(substring(str, pos + 1, len));
+	char *left = strip_free(substring(str, 0, (size_t) pos));
+	char *right = strip_free(substring(str, (size_t) pos + 1, (size_t) len));
 
 	node *left_node = string_to_node(left);
 	node *right_node = string_to_node(right);
@@ -281,7 +280,7 @@ static node *evaluate_node(node *n) {
 		case MUL: return evaluate_mul(n);
 		case POW: return evaluate_pow(n);
 		case DIV: return evaluate_div(n);
-		case NONE: return n;
+		default: return n;
 	}
 }
 
@@ -332,7 +331,7 @@ static char *etiquete(node *n) {
 static size_t find_index(node *tab[], size_t s, node *n) {
 	for(size_t i = 0; i < s; ++i)
 		if(tab[i] == n) return i;
-	return -1;
+	return 0; // Not reachable in theory
 }
 
 static void node_to_dot(node *n, FILE *f, size_t i, node *tab[], size_t size) {

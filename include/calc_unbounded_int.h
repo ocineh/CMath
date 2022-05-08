@@ -12,7 +12,7 @@ typedef struct interpreter interpreter;
 
 extern interpreter *create_interpreter(FILE *input, FILE *output, FILE *error);
 
-extern void destroy_interpreter(interpreter *interpreter);
+extern void destroy_interpreter(interpreter *inter);
 
 /**
  * Interprets instructions from one file and writes the result to another file.
@@ -73,9 +73,9 @@ extern unbounded_int eval(interpreter *inter, char *line);
 /**
  * Print the value of a variable.
  *
- * @param interpreter the interpreter
+ * @param inter the interpreter
  * @param name the name of a variable
  */
-extern void print(interpreter *interpreter, char *name);
+extern void print(interpreter *inter, char *name);
 
 #endif //PROJET_CALC_UNBOUNDED_INT_H

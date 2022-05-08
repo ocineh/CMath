@@ -210,14 +210,14 @@ bool test_uint_sum_3(void) {
 
 bool test_uint_sum_4(void) {
 	for(int i = 0; i < 100; ++i)
-		if(!test_uint_sum(NEGATIVE, POSITIVE))
+		if(!test_uint_sum(NEGATIVE, NEGATIVE))
 			return false;
 	return true;
 }
 
 bool test_uint_sum_5(void) {
 	for(int i = 0; i < 100; ++i)
-		if(!test_uint_sum(NEGATIVE, NEGATIVE))
+		if(!test_uint_sum(NEGATIVE, POSITIVE))
 			return false;
 	return true;
 }
