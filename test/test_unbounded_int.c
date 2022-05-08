@@ -425,3 +425,52 @@ bool test_uint_modulo_5(void) {
 			return false;
 	return true;
 }
+
+static long long absl(long long a) {
+	return a < 0 ? -a : a;
+}
+
+static bool test_uint_difference(long long a, long long b) {
+	unbounded_int u = ll2unbounded_int(a);
+	unbounded_int v = ll2unbounded_int(b);
+	unbounded_int w = ll2unbounded_int(absl(absl(a) - absl(b)));
+
+	unbounded_int difference = unbounded_int_difference(u, v);
+	bool result = unbounded_int_cmp_unbounded_int(difference, w) == 0;
+	if(result) {
+		free_unbounded_int(&difference);
+		difference = unbounded_int_difference(v, u);
+		result = unbounded_int_cmp_unbounded_int(difference, w) == 0;
+	}
+
+	free_unbounded_int(&u);
+	free_unbounded_int(&v);
+	free_unbounded_int(&w);
+	free_unbounded_int(&difference);
+	return result;
+}
+
+bool test_uint_difference_1(void) {
+	return test_uint_difference(POSITIVE, 0) && test_uint_difference(NEGATIVE, 0);
+}
+
+bool test_uint_difference_2(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_difference(POSITIVE, POSITIVE))
+			return false;
+	return true;
+}
+
+bool test_uint_difference_3(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_difference(NEGATIVE, NEGATIVE))
+			return false;
+	return true;
+}
+
+bool test_uint_difference_4(void) {
+	for(int i = 0; i < 100; ++i)
+		if(!test_uint_difference(NEGATIVE, POSITIVE))
+			return false;
+	return true;
+}
