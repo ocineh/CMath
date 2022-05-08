@@ -34,23 +34,24 @@ git clone https://github.com/ocineh/Numbinator.git
 git clone git@github.com:ocineh/Numbinator.git
 ```
 
-2. build the project
+2. build the project or just the library
 
 ```shell
-cmake -S . -B build
-cmake --build build
+make library
+# or
+make build
 ```
 
 3. run the project
 
 ```shell
-./build/app/app -i <FILE> -o <FILE> -e <FILE> 
+./build/app -i <FILE> -o <FILE> -e <FILE> 
 ```
 
 4. run the tests
 
 ```shell
-cmake --build build --target test
+make test
 ```
 
 ## Features
