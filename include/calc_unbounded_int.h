@@ -34,15 +34,6 @@ extern void interpret(interpreter *inter);
 extern bool valid_variable_name(char *name);
 
 /**
- * Checks if the variable is already defined.
- *
- * @param mem the memory where the variable is stored
- * @param name the name of the variable
- * @return
- */
-extern bool is_assigned(memory *mem, char *name);
-
-/**
  * Assign the value with the name of the variable.
  * If the name is already used or the variable name is not valid the operation will fail.
  *

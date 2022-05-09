@@ -96,8 +96,9 @@ static node *string_to_node(char *str) {
 	size_t len = strlen(str);
 
 	size_t pos;
-	if(!next_operator(str, '+', &pos) && !next_operator(str, '*', &pos) &&
-	   !next_operator(str, '/', &pos) && !next_operator(str, '^', &pos)) {
+	if(!next_operator(str, '+', &pos) && !next_operator(str, '-', &pos) &&
+	   !next_operator(str, '*', &pos) && !next_operator(str, '/', &pos) &&
+	   !next_operator(str, '^', &pos)) {
 		unbounded_int value = string2unbounded_int(str);
 		free(str);
 		return value_to_node(value);

@@ -94,21 +94,26 @@ bool valid_variable_name(char *name) {
 	return true;
 }
 
-bool is_assigned(memory *mem, char *name) {
+static node *get_node(memory *mem, char *name) {
 	node *curr = mem->head;
 	while(curr != NULL) {
-		if(strcmp(curr->name, name) == 0) return true;
+		if(strcmp(curr->name, name) == 0) return curr;
 		curr = curr->next;
 	}
-	return false;
+	return NULL;
 }
 
 unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	if(mem == NULL || name == NULL || isNaN(u)) return NULL;
 	if(!valid_variable_name(name)) return NULL;
-	if(is_assigned(mem, name)) return NULL;
+	node *n;
+	if((n = get_node(mem, name)) != NULL) {
+		free_unbounded_int(&n->value);
+		n->value = u;
+		return &n->value;
+	}
 
-	node *n = create_node(name, u);
+	n = create_node(name, u);
 	if(n == NULL) return NULL;
 	mem->size++;
 	if(mem->head == NULL)

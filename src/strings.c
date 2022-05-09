@@ -70,7 +70,8 @@ char *__concat__(char *s, ...) {
 
 bool is_arithmetic(char c) {
 	if(isdigit(c)) return true;
-	if(c == '+' || c == '-' || c == '*') return true;
+	if(c == '+' || c == '-' || c == '*' || c == '/' || c == '^')
+		return true;
 	return c == ' ';
 }
 
