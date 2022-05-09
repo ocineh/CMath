@@ -25,13 +25,19 @@ build/library.a: $(OBJECT_FILES)
 build/tests: build/library.a $(wildcard test/*.c)
 	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c test/test_unbounded_int.h build/library.a
 
-build/cli: build/library.a
+library: build/library.a
+	@make build/tests
+	@./build/tests > build/tests.log || (printf "\033[31mTests failed (see tests.log)\033[0m\n" && exit 1)
+	@printf "\033[32mTests passed\n\033[0m"
+
+build/cli: library
 	$(COMPILE) -o build/cli cli/main.c build/library.a
 
-library: build/library.a
 test: build/tests
 	./build/tests
+
 build: build/cli
+	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
 
 clean:
 	rm -rf build

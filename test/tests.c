@@ -6,10 +6,11 @@
 
 #define NUMBER_OF_TESTS 43
 static int test_count = 0;
+static bool FAILED = false;
 
 static void test(bool (*f)(void), const char *msg) {
 	if(f()) printf("(%2d/%d) \033[32m%-42s: OK\n\033[0m", ++test_count, NUMBER_OF_TESTS, msg);
-	else printf("(%2d/%d) \033[31m%-42s: FAIL\n\033[0m", ++test_count, NUMBER_OF_TESTS, msg);
+	else printf("(%2d/%d) \033[31m%-42s: FAIL\n\033[0m", ++test_count, NUMBER_OF_TESTS, msg), FAILED = true;
 }
 
 int main(void) {
@@ -78,5 +79,5 @@ int main(void) {
 	test(test_uint_difference_2, "Test with two positive numbers");
 	test(test_uint_difference_3, "Test with two negative numbers");
 	test(test_uint_difference_4, "Test with a negative and a positive number");
-	return 0;
+	return FAILED ? EXIT_FAILURE : EXIT_SUCCESS;
 }
