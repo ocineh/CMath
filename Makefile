@@ -11,6 +11,7 @@ help:
 	@echo "Available targets:"
 	@echo "  library: Create the library of the project"
 	@echo "  build: Build the command line program"
+	@echo "  run-example: Run the program with a sample input"
 	@echo "  test: Run the tests"
 	@echo "  clean: Clean the build directory"
 	@echo "  help: Print this message"
@@ -38,6 +39,21 @@ test: build/tests
 
 build: build/cli
 	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
+
+run-example: build/cli
+	@printf "========================================================\n"
+	@echo -e '\nvar = 5 / 2\nprint var' \
+			 '\nvar = 5 * 2\nprint var' \
+			 '\nvar = 5 - 2\nprint var' \
+			 '\nvar = 5 + 2\nprint var' \
+			 '\nvar = 5^2\nprint var' \
+			 '\nvar2 = 10^10\nprint var2' \
+			 '\nbbbbbbbbbb = var2 - 74 * 96 + -12\nprint bbbbbbbbbb' \
+			 '\nvar = 54786 * 854 + var2 / 7^3 + -5963 - bbbbbbbbbb\nprint var\n' > input.txt
+	./build/cli -i input.txt -o output.txt
+	cat output.txt
+	@rm -f input.txt output.txt
+	@printf "========================================================\n"
 
 clean:
 	rm -rf build
