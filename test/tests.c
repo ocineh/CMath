@@ -14,7 +14,7 @@ static void test(bool (*f)(void), const char *msg) {
 }
 
 int main(void) {
-	srand((unsigned) time(NULL));
+	srandom((unsigned) time(NULL));
 	printf("========================= Testing unbounded int =========================\n\n");
 
 	printf("Test the creation of an unbounded int\n");

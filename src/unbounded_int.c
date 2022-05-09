@@ -6,17 +6,19 @@
 
 static void push_back(unbounded_int *u, char n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
-	p_chiffre->c = n;
-	p_chiffre->precedent = NULL;
-	p_chiffre->suivant = NULL;
+	if(p_chiffre != NULL) {
+		p_chiffre->c = n;
+		p_chiffre->precedent = NULL;
+		p_chiffre->suivant = NULL;
 
-	++u->len;
-	if(u->premier == NULL) u->premier = u->dernier = p_chiffre;
-	else {
-		p_chiffre->precedent = u->dernier;
-		u->dernier->suivant = p_chiffre;
-		u->dernier = p_chiffre;
-	}
+		++u->len;
+		if(u->premier == NULL) u->premier = u->dernier = p_chiffre;
+		else {
+			p_chiffre->precedent = u->dernier;
+			u->dernier->suivant = p_chiffre;
+			u->dernier = p_chiffre;
+		}
+	} else abort();
 }
 
 static int ctoi(const char c) {
@@ -35,17 +37,19 @@ static int cpm(char a, char b) {
 
 static void push_front(unbounded_int *u, int n) {
 	chiffre *p_chiffre = malloc(sizeof(chiffre));
-	p_chiffre->c = itoc(n);
-	p_chiffre->suivant = p_chiffre->precedent = NULL;
+	if(p_chiffre != NULL) {
+		p_chiffre->c = itoc(n);
+		p_chiffre->suivant = p_chiffre->precedent = NULL;
 
-	if(u->premier == NULL) {
-		u->premier = u->dernier = p_chiffre;
-	} else {
-		p_chiffre->suivant = u->premier;
-		u->premier->precedent = p_chiffre;
-		u->premier = p_chiffre;
-	}
-	++u->len;
+		if(u->premier == NULL) {
+			u->premier = u->dernier = p_chiffre;
+		} else {
+			p_chiffre->suivant = u->premier;
+			u->premier->precedent = p_chiffre;
+			u->premier = p_chiffre;
+		}
+		++u->len;
+	} else abort();
 }
 
 static unbounded_int strip_unbounded_int(unbounded_int u) {
@@ -70,57 +74,50 @@ static unbounded_int strip_unbounded_int(unbounded_int u) {
 	return u;
 }
 
-unbounded_int string2unbounded_int(const char *e) {
-	unbounded_int result = { .signe='*', .len = 0 };
-	size_t len = strlen(e);
+unbounded_int string2unbounded_int(char *str) {
+	unbounded_int result = NaN;
+	str = strip(str);
+	size_t len = strlen(str);
 	if(len > 0) {
 		size_t i = 0;
-		while(i < len && isspace(e[i])) ++i;
-
-		if(e[i] == '-' || e[i] == '+') {
-			result.signe = e[i];
-			++i;
-		} else if(isdigit(e[i])) result.signe = '+';
-		else return result;
+		if(str[i] == '-' || str[i] == '+') result.signe = str[i++];
+		else if(isdigit(str[i])) result.signe = '+';
+		else return result; // NaN
 
 		while(i < len) {
-			if(isdigit(e[i])) push_back(&result, e[i++]);
+			if(isdigit(str[i])) push_back(&result, str[i++]);
 			else {
 				free_unbounded_int(&result);
-				return NaN;
+				break;
 			}
 		}
 	}
+	free(str);
 	return strip_unbounded_int(result);
 }
 
 unbounded_int ll2unbounded_int(long long int i) {
 	if(i == 0) return string2unbounded_int("0");
 	long long n = i < 0 ? -i : i;
-	unsigned count = i < 0 ? 1 : 0;
+	unsigned len = i < 0 ? 1 : 0;
 	while(n > 0) {
-		++count;
+		++len;
 		n /= 10;
 	}
 
-	char tmp[count + 1];
-	tmp[count] = '\0';
+	char tmp[len + 1];
 	sprintf(tmp, "%lli", i);
 	return string2unbounded_int(tmp);
 }
 
 char *unbounded_int2string(unbounded_int i) {
-	if(isNaN(i)) return concat("NaN");
-	size_t len = i.len + (i.signe == '-') + 1;
-	char *res = malloc(sizeof(char) * len);
-	res[len - 1] = '\0';
-	size_t j = 0;
+	if(isNaN(i)) return copy("NaN");
+	size_t len = i.len + (i.signe == '-') + 1, j = 0;
+	char *res = calloc(len, sizeof(char));
 	if(i.signe == '-') res[j++] = '-';
-	chiffre *p_chiffre = i.premier;
-	while(j <= i.len && p_chiffre != NULL) {
-		res[j++] = p_chiffre->c;
-		p_chiffre = p_chiffre->suivant;
-	}
+
+	for(chiffre *p = i.premier; p != NULL; p = p->suivant)
+		res[j++] = p->c;
 	return res;
 }
 
@@ -145,8 +142,7 @@ int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
 
 static int cmp_abs(unbounded_int a, unbounded_int b) {
 	a.signe = b.signe = '+';
-	int tmp = unbounded_int_cmp_unbounded_int(a, b);
-	return tmp;
+	return unbounded_int_cmp_unbounded_int(a, b);
 }
 
 int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
@@ -195,10 +191,8 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 		chiffre *p_a = a->dernier, *p_b = b->dernier;
 		while(p_a != NULL && p_b != NULL) {
 			int i = ctoi(p_a->c), j = ctoi(p_b->c);
-			if(i == j) {
-				if(hold < 0) tmp = -10 - (10 - ((j + abs(hold)) - i));
-				else tmp = hold;
-			} else if(i < j) tmp = -10 - (10 - ((j + abs(hold)) - i));
+			if(i == j) tmp = hold < 0 ? -(20 + hold) : hold;
+			else if(i < j) tmp = -10 - (10 - (j - i + -hold));
 			else tmp = i - j + hold;
 
 			hold = tmp / 10;
@@ -211,7 +205,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 		chiffre *p = p_a == NULL ? p_b : p_a;
 		while(p != NULL) {
 			int i = ctoi(p->c);
-			if(hold < 0 && -hold > i) tmp = -10 - (10 - (abs(hold) - i));
+			if(hold < 0 && -hold > i) tmp = -10 - (10 - (i + -hold));
 			else tmp = i + hold;
 			hold = tmp / 10;
 			tmp %= 10;
@@ -243,8 +237,7 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 }
 
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
-	a.signe = '+';
-	b.signe = '-';
+	a.signe = '+', b.signe = '-';
 	unbounded_int r = unbounded_int_somme(a, b);
 	r.signe = '+';
 	return r;
@@ -281,17 +274,24 @@ static void left_shift(unbounded_int *u, long long unsigned n) {
 			push_back(u, '0');
 }
 
-static void right_shift(unbounded_int *u, long long unsigned n) {
-	if(!isZERO((*u))) {
-		chiffre *actual = u->dernier;
-		while(n-- > 0 && actual != NULL) {
-			actual = actual->precedent;
+static void pop_back(unbounded_int *u) {
+	if(u->dernier != NULL) {
+		if(u->len == 1) {
+			u->premier->c = '0';
+			return;
+		} else {
+			u->dernier = u->dernier->precedent;
+			free_chiffre(u->dernier->suivant);
+			u->dernier->suivant = NULL;
 			--u->len;
 		}
-		free_chiffre(actual->suivant);
-		actual->suivant = NULL;
-		u->dernier = actual;
 	}
+}
+
+static void right_shift(unbounded_int *u, long long unsigned n) {
+	if(!isZERO((*u)))
+		while(n-- > 0 && u->len > 0)
+			pop_back(u);
 }
 
 static unbounded_int unbounded_int_fois_chiffre(unbounded_int *a, chiffre *c) {
@@ -325,14 +325,16 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	chiffre *c_b = b.dernier;
 	long long unsigned rand = 0;
 	while(c_b != NULL) {
-		unbounded_int inter = unbounded_int_fois_chiffre(&a, c_b);
-		inter.signe = result.signe;
-		left_shift(&inter, rand);
+		if(c_b->c != '0') {
+			unbounded_int inter = unbounded_int_fois_chiffre(&a, c_b);
+			inter.signe = result.signe;
+			left_shift(&inter, rand);
 
-		unbounded_int tmp_bis = unbounded_int_somme(result, inter);
-		free_unbounded_int(&inter);
-		free_unbounded_int(&result);
-		result = tmp_bis;
+			unbounded_int tmp_bis = unbounded_int_somme(result, inter);
+			free_unbounded_int(&inter);
+			free_unbounded_int(&result);
+			result = tmp_bis;
+		}
 
 		++rand;
 		c_b = c_b->precedent;
@@ -341,8 +343,9 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 }
 
 unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
+	if(isNaN(u) || isNaN(n) || n.signe == '-') return NaN;
 	if(isZERO(n)) return string2unbounded_int("1");
-	if(n.signe == '-') return NaN;
+	if(isZERO(u)) return ZERO;
 	n = copy_unbounded_int(&n);
 
 	unbounded_int result = copy_unbounded_int(&u);
@@ -356,6 +359,7 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 		free_unbounded_int(&n);
 		n = tmp;
 	}
+
 	free_unbounded_int(&n);
 	free_unbounded_int(&one);
 	free_unbounded_int(&minus_one);
@@ -377,33 +381,33 @@ static unbounded_int unbounded_int_division(unbounded_int a, unbounded_int b, bo
 
 	unbounded_int remain = copy_unbounded_int(&a);
 	unbounded_int pas = copy_unbounded_int(&b);
-	remain.signe = b.signe = '+';
+	remain.signe = b.signe = pas.signe = '+';
 
 	unbounded_int count = string2unbounded_int("1");
-	left_shift(&count, remain.len - pas.len);
+	if(!modulo) left_shift(&count, remain.len - pas.len);
 	left_shift(&pas, remain.len - pas.len);
 
 	unbounded_int quotient = string2unbounded_int("0"), tmp;
 	while(unbounded_int_cmp_unbounded_int(remain, b) >= 0) {
-		pas.signe = '+';
-		while(unbounded_int_cmp_unbounded_int(remain, pas) == -1) {
-			right_shift(&count, 1);
+		if(unbounded_int_cmp_unbounded_int(remain, pas) == -1) {
 			right_shift(&pas, 1);
+			if(!modulo) right_shift(&count, 1);
+			continue;
 		}
-		pas.signe = '-';
 
-		tmp = unbounded_int_somme(remain, pas);
+		tmp = unbounded_int_difference(remain, pas);
 		free_unbounded_int(&remain);
 		remain = tmp;
 
-		tmp = unbounded_int_somme(quotient, count);
-		free_unbounded_int(&quotient);
-		quotient = tmp;
+		if(!modulo) {
+			tmp = unbounded_int_somme(quotient, count);
+			free_unbounded_int(&quotient);
+			quotient = tmp;
+		}
 	}
 
 	quotient.signe = minus ? '-' : '+';
-	if(isZERO(remain)) remain.signe = '+';
-	else remain.signe = a.signe;
+	remain.signe = isZERO(remain) ? '+' : a.signe;
 	unbounded_int result = copy_unbounded_int(modulo ? &remain : &quotient);
 
 	free_unbounded_int(&count);

@@ -1,7 +1,7 @@
 .DEFAULT_GOAL: help
 
 COMPILER=gcc
-OPTIONS=-std=c11 -Iinclude -pedantic -Wall -Wextra -Werror -Wshadow -Wconversion -Wunreachable-code
+OPTIONS=-std=c11 -Iinclude -pedantic -Wall -Wextra -Wshadow -Wconversion -Wunreachable-code
 COMPILE=$(COMPILER) $(OPTIONS)
 SOURCE_FILES = $(wildcard src/*.c)
 OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))
@@ -24,7 +24,7 @@ build/library.a: $(OBJECT_FILES)
 	ar -rcs build/library.a $(OBJECT_FILES)
 
 build/tests: build/library.a $(wildcard test/*.c)
-	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c test/test_unbounded_int.h build/library.a
+	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c build/library.a
 
 library: build/library.a
 	@make build/tests

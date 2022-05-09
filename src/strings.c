@@ -21,9 +21,9 @@ char *strip(char *c) {
 
 	if(begin > end) return "";
 	size_t len = end - begin + 1;
-	char *new = malloc(len + 1);
+	char *new = calloc(len + 1, sizeof(char));
+	if(new == NULL) return NULL;
 	memmove(new, c + begin, len);
-	new[len] = '\0';
 	return new;
 }
 
@@ -39,8 +39,8 @@ bool index_of(const char *s, char c, size_t *index) {
 
 char *substring(const char *s, size_t begin, size_t end) {
 	if(begin > end) return NULL;
-	char *new = malloc(end - begin + 1);
-	if(!new) return NULL;
+	char *new = calloc(end - begin + 1, sizeof(char));
+	if(new == NULL) return NULL;
 	memmove(new, s + begin, end - begin + 1);
 	new[end - begin] = '\0';
 	return new;
@@ -56,12 +56,19 @@ char *__concat__(char *s, ...) {
 	va_end(args);
 
 	va_start(args, s);
-	char *new = malloc(len + 1);
-	memmove(new, s, strlen(s) + 1);
+	char *new = calloc(len + 1, sizeof(char));
+	if(new == NULL) return NULL;
+	if(memmove(new, s, strlen(s) + 1) == NULL) {
+		free(new);
+		return NULL;
+	}
 	size_t j = strlen(s);
 	while((tmp = va_arg(args, char *)) != NULL) {
 		size_t l = strlen(tmp);
-		memmove(new + j, tmp, l + 1);
+		if(memmove(new + j, tmp, l + 1) == NULL) {
+			free(new);
+			return NULL;
+		}
 		j += l;
 	}
 	va_end(args);
@@ -69,10 +76,7 @@ char *__concat__(char *s, ...) {
 }
 
 bool is_arithmetic(char c) {
-	if(isdigit(c)) return true;
-	if(c == '+' || c == '-' || c == '*' || c == '/' || c == '^')
-		return true;
-	return c == ' ';
+	return isdigit(c) || (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '%') || c == ' ';
 }
 
 bool is_arithmetic_expression(const char *s) {
@@ -85,10 +89,7 @@ bool is_arithmetic_expression(const char *s) {
 }
 
 bool is_digit(char c) {
-	if(c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7' || c == '8' ||
-	   c == '9')
-		return true;
-	return false;
+	return '0' <= c && c <= '9';
 }
 
 char *remove_spaces(char *s) {
@@ -96,12 +97,12 @@ char *remove_spaces(char *s) {
 	char *tmp = s;
 	while(*tmp != '\0') if(!isspace(*(tmp++))) ++len;
 
-	char *res = malloc(len + 1);
+	char *res = calloc(len + 1, sizeof(char));
+	if(res == NULL) return NULL;
 	for(size_t j = 0, i = 0; j < len; ++j) {
 		while(isspace(s[i])) ++i;
 		res[j] = s[i++];
 	}
-	res[len] = '\0';
 	return res;
 }
 

@@ -8,7 +8,6 @@ typedef struct node {
 	char *name;
 	unbounded_int value;
 	struct node *next;
-	struct node *prev;
 } node;
 
 typedef struct memory {
@@ -29,7 +28,7 @@ static node *create_node(char *name, unbounded_int value) {
 	if(n == NULL) return NULL;
 	n->name = copy(name);
 	n->value = value;
-	n->next = n->prev = NULL;
+	n->next = NULL;
 	return n;
 }
 
@@ -120,7 +119,6 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 		mem->head = mem->tail = n;
 	else {
 		mem->tail->next = n;
-		n->prev = mem->tail;
 		mem->tail = n;
 	}
 	return &n->value;

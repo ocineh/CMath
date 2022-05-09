@@ -44,10 +44,10 @@ extern void free_unbounded_int(unbounded_int *a);
  * /!\ If the string does not correspond to a number,
  * return an instance of unbounded_int with the field sign == '*'.
  *
- * @param e a string of characters of a number
+ * @param str a string of characters of a number
  * @return an instance of unbounded_int
  */
-extern unbounded_int string2unbounded_int(const char *e);
+extern unbounded_int string2unbounded_int(char *str);
 
 /**
  * Create an unbounded_int instance from a `long long int`.

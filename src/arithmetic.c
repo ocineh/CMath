@@ -1,4 +1,4 @@
-#include <malloc.h>
+#include <stdlib.h>
 #include "arithmetic.h"
 #include "strings.h"
 

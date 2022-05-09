@@ -15,7 +15,7 @@ static bool uint_cmp_char(unbounded_int u, char *s) {
 }
 
 static long long random_ll(long long min, long long max) {
-	return (min + (rand() % (max - min + 1)));
+	return (min + (random() % (max - min + 1)));
 }
 
 #define POSITIVE (random_ll(0, 10000))
@@ -30,7 +30,7 @@ static size_t len(long long n) {
 }
 
 static bool test_create_uint_from_string(long long n) {
-	char *s = malloc(len(n) + 1);
+	char *s = calloc(len(n) + 1, sizeof(char));
 	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 	char signe = (*s) == '-' ? '-' : '+';
@@ -62,7 +62,8 @@ bool test_create_uint_from_string_with_invalid_string_2(void) {
 
 bool test_create_uint_from_ll_1(void) {
 	long long n = POSITIVE;
-	char *s = malloc(len(n) + 1);
+	char *s = calloc(len(n) + 1, sizeof(char));
+	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 
 	unbounded_int u = ll2unbounded_int(n);
@@ -74,7 +75,7 @@ bool test_create_uint_from_ll_1(void) {
 
 bool test_create_uint_from_ll_2(void) {
 	long long n = NEGATIVE;
-	char *s = malloc(len(n) + 1);
+	char *s = calloc(len(n) + 1, sizeof(char));
 	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 
@@ -86,7 +87,7 @@ bool test_create_uint_from_ll_2(void) {
 }
 
 static bool test_create_string_from_uint(long long n) {
-	char *s = malloc(len(n) + 1);
+	char *s = calloc(len(n) + 1, sizeof(char));
 	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 
