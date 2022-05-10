@@ -3,7 +3,7 @@
 #include "strings.h"
 
 typedef enum operator {
-	ADD, SUB, MUL, POW, DIV, NONE
+	ADD, SUB, MUL, POW, DIV, MOD, NONE
 } operator;
 
 typedef struct node {
@@ -71,11 +71,12 @@ static operator char_to_operator(char c) {
 		case '*': return MUL;
 		case '/': return DIV;
 		case '^': return POW;
+		case '%': return MOD;
 		default: return NONE;
 	}
 }
 
-#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^')
+#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^' || (c) == '%')
 
 static bool is_unary_operator(char *s, size_t i) {
 	return (s[i] == '+' || s[i] == '-') && (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
@@ -98,7 +99,7 @@ static node *string_to_node(char *str) {
 	size_t pos;
 	if(!next_operator(str, '+', &pos) && !next_operator(str, '-', &pos) &&
 	   !next_operator(str, '*', &pos) && !next_operator(str, '/', &pos) &&
-	   !next_operator(str, '^', &pos)) {
+	   !next_operator(str, '%', &pos) && !next_operator(str, '^', &pos)) {
 		unbounded_int value = string2unbounded_int(str);
 		free(str);
 		return value_to_node(value);
@@ -246,6 +247,25 @@ static node *evaluate_div(node *n) {
 	return n;
 }
 
+static node *evaluate_mod(node *n) {
+	if(n->operator == MOD) {
+		if(n->right->operator == NONE) {
+			if(isONE(n->right->operand)) {
+				free_node(n);
+				return value_to_node(ZERO);
+			} else if(isZERO(n->right->operand)) {
+				free_node(n);
+				return value_to_node(NaN);
+			} else if(n->left->operator == NONE) {
+				unbounded_int res = unbounded_int_modulo(n->left->operand, n->right->operand);
+				free_node(n);
+				return value_to_node(res);
+			}
+		}
+	}
+	return n;
+}
+
 static node *evaluate_add(node *n) {
 	if(n->operator == ADD) {
 		if(n->left->operator == NONE && n->right->operator == NONE) {
@@ -281,6 +301,7 @@ static node *evaluate_node(node *n) {
 		case MUL: return evaluate_mul(n);
 		case POW: return evaluate_pow(n);
 		case DIV: return evaluate_div(n);
+		case MOD: return evaluate_mod(n);
 		default: return n;
 	}
 }
@@ -326,6 +347,7 @@ static char *etiquete(node *n) {
 	if(n->operator == MUL) return concat("MUL");
 	if(n->operator == DIV) return concat("DIV");
 	if(n->operator == POW) return concat("POW");
+	if(n->operator == MOD) return concat("MOD");
 	return concat("NULL");
 }
 
