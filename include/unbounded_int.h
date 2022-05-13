@@ -21,8 +21,8 @@ typedef struct chiffre {
 } chiffre;
 
 /**
- * @brief a structure representing an unbounded signed integer.
- * @details The structure of an unbounded signed integer.
+ * @brief a structure representing an signed integer.
+ * @details The structure representing an signed integer in the form of a linked list of digits.
  * @see chiffre
  */
 typedef struct unbounded_int {
@@ -132,8 +132,21 @@ extern unbounded_int copy_unbounded_int(unbounded_int *a);
  */
 extern unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n);
 
+/**
+ * The quotient of the division of two unbounded_int.
+ * @param a an instance of unbounded_int (dividend)
+ * @param b an instance of unbounded_int (divisor)
+ * @return the quotient of a and b
+ */
 extern unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b);
 
+/**
+ * The remainder of the division of two unbounded_int.
+ *
+ * @param a an instance of unbounded_int (dividend)
+ * @param b an instance of unbounded_int (divisor)
+ * @return the remainder of a and b
+ */
 extern unbounded_int unbounded_int_modulo(unbounded_int a, unbounded_int b);
 
 #endif //PROJET_UNBOUNDED_INT_H

@@ -43,6 +43,7 @@ static memory *create_memory() {
 interpreter *create_interpreter(FILE *input, FILE *output, FILE *error) {
 	if(input == NULL) input = stdin;
 	if(output == NULL) output = stdout;
+	if(error == NULL) error = stderr;
 
 	interpreter *interp = malloc(sizeof(interpreter));
 	if(interp == NULL) return NULL;

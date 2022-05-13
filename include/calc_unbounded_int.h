@@ -10,8 +10,21 @@ typedef struct memory memory;
 
 typedef struct interpreter interpreter;
 
+/**
+ * Create a new interpreter with the given file.
+ *
+ * @param input an input file
+ * @param output an output file
+ * @param error an error file
+ * @return a new interpreter
+ */
 extern interpreter *create_interpreter(FILE *input, FILE *output, FILE *error);
 
+/**
+ * Destroy the interpreter and free all the memory used.
+ *
+ * @param inter the interpreter to destroy (free)
+ */
 extern void destroy_interpreter(interpreter *inter);
 
 /**
