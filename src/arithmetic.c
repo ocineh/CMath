@@ -57,12 +57,6 @@ void free_tree(tree *t) {
 	}
 }
 
-static char *strip_free(char *s) {
-	char *res = strip(s);
-	free(s);
-	return res;
-}
-
 static operator char_to_operator(char c) {
 	switch(c) {
 		case '+': return ADD;
@@ -77,53 +71,63 @@ static operator char_to_operator(char c) {
 
 #define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^' || (c) == '%')
 
-static bool is_unary_operator(char *s, size_t i) {
-	return (s[i] == '+' || s[i] == '-') && (i == 0 || is_operator(s[i - 1])) && isdigit(s[i + 1]);
+static bool is_unary_operator(const char *s, size_t i) {
+	return strchr("+-", *s) && (i == 0 || is_operator(s[i - 1])) && isdigit(s[i + 1]);
 }
 
-static bool next_operator(char *s, char c, size_t *index) {
-	size_t len = strlen(s);
-	for(size_t i = 0; i < len; ++i)
-		if(s[i] == c && !(is_unary_operator(s, i))) {
-			if(index != NULL) *index = i;
-			return true;
-		}
-	return false;
+static char *next_operator(char *s, char c) {
+	// We need this to handle unary operators.
+	for(size_t i = 0, len = strlen(s); i < len; ++i)
+		if(s[i] == c && !(is_unary_operator(s, i)))
+			return s + i;
+	return NULL;
 }
 
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 static node *string_to_node(char *str) {
 	str = strip(str);
-	size_t len = strlen(str);
+	// The more deep is a node, the higher is its priority.
 
-	size_t pos;
-	if(!next_operator(str, '+', &pos) && !next_operator(str, '-', &pos)) {
-		size_t pos_mul, pos_div, pos_mod;
-		bool mul = next_operator(str, '*', &pos_mul);
-		bool div = next_operator(str, '/', &pos_div);
-		bool mod = next_operator(str, '%', &pos_mod);
+	char *pos;
+	if((pos = next_operator(str, '+')) == NULL && (pos = next_operator(str, '-')) == NULL) {
+		// The *, / and % operators have the same priority then we need to search for the far near one.
+		char *pos_mul = next_operator(str, '*');
+		char *pos_div = next_operator(str, '/');
+		char *pos_mod = next_operator(str, '%');
+		bool mul = pos_mul != NULL, div = pos_div != NULL, mod = pos_mod != NULL;
 
+		// If only one of these operators is found, we can just use it.
 		if((mul && !div && !mod) || (!mul && div && !mod) || (!mul && !div && mod))
 			pos = mul ? pos_mul : (div ? pos_div : pos_mod);
-		else if(mul && div && !mod) pos = max(pos_mul, pos_div);
-		else if(mul && !div && mod) pos = max(pos_mul, pos_mod);
-		else if(!mul && div && mod) pos = max(pos_div, pos_mod);
-		else if(mul && div && mod) pos = max(pos_mul, max(pos_div, pos_mod));
-		else if(!next_operator(str, '^', &pos)) {
+			// If both of these operators are found, we need to find the one the more far away.
+		else if(mul && div && !mod)
+			pos = max(pos_mul, pos_div);
+		else if(mul && !div && mod)
+			pos = max(pos_mul, pos_mod);
+		else if(!mul && div && mod)
+			pos = max(pos_div, pos_mod);
+			// If the three operators are found, we need to find the one the more far away.
+		else if(mul && div && mod)
+			pos = max(pos_mul, max(pos_div, pos_mod));
+			// If none of these operators are found, we search for the ^ operator.
+		else if((pos = next_operator(str, '^')) == NULL) {
+			// If there is no operator apart the unary one, we can just try to parse the string as a value.
 			unbounded_int value = string2unbounded_int(str);
 			free(str);
 			return value_to_node(value);
 		}
 	}
 
-	char *left = strip_free(substring(str, 0, (size_t) pos));
-	char *right = strip_free(substring(str, (size_t) pos + 1, (size_t) len));
+	// We found an operator, we need to recursively parse the left and right subtrees.
+	operator op = char_to_operator(*pos);
+	*pos = '\0';
+	char *left = strip(str);
+	char *right = strip(pos + 1);
 
 	node *left_node = string_to_node(left);
 	node *right_node = string_to_node(right);
 
-	operator op = char_to_operator(str[pos]);
 	free(str);
 	free(left);
 	free(right);
@@ -133,6 +137,7 @@ static node *string_to_node(char *str) {
 tree *string_to_tree(char *str) {
 	if(str == NULL) return NULL;
 	str = strip(str);
+	// Remove the spaces for simplifying the parsing.
 	char *tmp = remove_spaces(str);
 	free(str);
 	str = tmp;
@@ -146,7 +151,6 @@ tree *string_to_tree(char *str) {
 
 	t->root = string_to_node(str);
 	if(t->root == NULL) {
-		free(t->root);
 		free(t);
 		free(str);
 		return NULL;
@@ -155,7 +159,7 @@ tree *string_to_tree(char *str) {
 	return t;
 }
 
-static char *operator_to_char(operator op) {
+static char *operator_to_string(operator op) {
 	switch(op) {
 		case ADD: return "+";
 		case SUB: return "-";
@@ -178,7 +182,7 @@ static char *node_to_string(node *n) {
 
 	char *left = node_to_string(n->left);
 	char *right = node_to_string(n->right);
-	char *res = concat(left, " ", operator_to_char(n->operator), " ", right);
+	char *res = concat(left, " ", operator_to_string(n->operator), " ", right);
 	free(left);
 	free(right);
 	return res;
