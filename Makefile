@@ -1,7 +1,7 @@
 .DEFAULT_GOAL: help
 
 COMPILER=gcc
-OPTIONS=-std=c11 -Iinclude -pedantic -Wall -Wextra -Wshadow -Wconversion -Wunreachable-code
+OPTIONS=-std=gnu11 -Iinclude -pedantic -Wall -Wextra -Wshadow -Wconversion -Wunreachable-code
 COMPILE=$(COMPILER) $(OPTIONS)
 SOURCE_FILES = $(wildcard src/*.c)
 OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))
@@ -31,13 +31,14 @@ library: build/library.a
 	@./build/tests > build/tests.log || (printf "\033[31mTests failed (see tests.log)\033[0m\n" && exit 1)
 	@printf "\033[32mTests passed\n\033[0m"
 
-build/cli: library
+build/cli: build/library.a
 	$(COMPILE) -o build/cli cli/main.c build/library.a
 
 test: build/tests
 	./build/tests
 
 build: build/cli
+	@make library
 	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
 
 run-example: build/cli
