@@ -23,7 +23,7 @@ struct tree {
 
 static node *operator_to_node(operator op, node *left, node *right) {
 	if(left == NULL || right == NULL) return NULL;
-	node *n = malloc(sizeof(node));
+	node *n = calloc(1, sizeof(node));
 	if(n == NULL) return NULL;
 	n->operator = op;
 	n->left = left;
@@ -78,7 +78,7 @@ static operator char_to_operator(char c) {
 #define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^' || (c) == '%')
 
 static bool is_unary_operator(char *s, size_t i) {
-	return (s[i] == '+' || s[i] == '-') && (i == 0 || is_operator(s[i - 1])) && is_digit(s[i + 1]);
+	return (s[i] == '+' || s[i] == '-') && (i == 0 || is_operator(s[i - 1])) && isdigit(s[i + 1]);
 }
 
 static bool next_operator(char *s, char c, size_t *index) {
@@ -139,9 +139,14 @@ tree *string_to_tree(char *str) {
 	if(*str == '\0') return NULL;
 
 	tree *t = malloc(sizeof(tree));
-	if(t == NULL) return NULL;
+	if(t == NULL) {
+		free(str);
+		return NULL;
+	}
+
 	t->root = string_to_node(str);
 	if(t->root == NULL) {
+		free(t->root);
 		free(t);
 		free(str);
 		return NULL;

@@ -1,17 +1,8 @@
-#include <ctype.h>
 #include <stdlib.h>
-#include <memory.h>
 #include <stdarg.h>
 #include "strings.h"
 
-size_t strlen(const char *s) {
-	size_t len = 0;
-	while((*s++) != '\0')
-		len++;
-	return len;
-}
-
-char *strip(char *c) {
+char *strip(const char *c) {
 	if(!c) return NULL;
 	size_t begin = 0;
 	while(isspace(c[begin])) begin++;
@@ -27,16 +18,6 @@ char *strip(char *c) {
 	return new;
 }
 
-bool index_of(const char *s, char c, size_t *index) {
-	size_t len = strlen(s);
-	for(size_t i = 0; i < len; ++i)
-		if(s[i] == c) {
-			if(index) *index = i;
-			return true;
-		}
-	return false;
-}
-
 char *substring(const char *s, size_t begin, size_t end) {
 	if(begin > end) return NULL;
 	char *new = calloc(end - begin + 1, sizeof(char));
@@ -46,7 +27,7 @@ char *substring(const char *s, size_t begin, size_t end) {
 	return new;
 }
 
-char *__concat__(char *s, ...) {
+char *__concat__(const char *s, ...) {
 	va_list args;
 	va_start(args, s);
 	size_t len = strlen(s);
@@ -75,26 +56,32 @@ char *__concat__(char *s, ...) {
 	return new;
 }
 
-bool is_arithmetic(char c) {
-	return isdigit(c) || (c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || c == '%') || c == ' ';
-}
+#define is_operator(c) (strchr("+-*/^%", c) != NULL)
+#define is_unary(c) (strchr("+-", (c)) != NULL)
 
 bool is_arithmetic_expression(const char *s) {
-	size_t len = strlen(s);
+	char *tmp = remove_spaces(s);
+	size_t len = strlen(tmp);
 	if(len == 0) return false;
-	for(size_t i = 0; i < len; ++i)
-		if(!is_arithmetic(s[i]))
-			return false;
+	if(!isdigit(tmp[0]) && !is_unary(tmp[0])) return false;
+
+	for(size_t i = 1; i < len - 1; ++i) {
+		if(is_operator(tmp[i])) {
+			if(is_operator(tmp[i - 1]) && !is_unary(tmp[i]))
+				return false;
+			if(is_operator(tmp[i + 1]) && !is_unary(tmp[i]))
+				return false;
+		} else if(!isdigit(tmp[i])) return false;
+	}
+
+	if(!isdigit(tmp[len - 1]) && !is_unary(tmp[len - 1])) return false;
+	free(tmp);
 	return true;
 }
 
-bool is_digit(char c) {
-	return '0' <= c && c <= '9';
-}
-
-char *remove_spaces(char *s) {
+char *remove_spaces(const char *s) {
 	size_t len = 0;
-	char *tmp = s;
+	const char *tmp = s;
 	while(*tmp != '\0') if(!isspace(*(tmp++))) ++len;
 
 	char *res = calloc(len + 1, sizeof(char));
@@ -104,11 +91,4 @@ char *remove_spaces(char *s) {
 		res[j] = s[i++];
 	}
 	return res;
-}
-
-bool is_empty(const char *s) {
-	if(s == NULL) return true;
-	if(s[0] == '\0') return true;
-	while(*s == ' ') ++s;
-	return *s == '\0';
 }

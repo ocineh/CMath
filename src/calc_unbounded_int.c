@@ -89,7 +89,9 @@ bool valid_variable_name(char *name) {
 	if(len == 0) return false;
 
 	if(!isalpha(name[0])) return false;
-	for(size_t i = 0; i < len; ++i) if(!isalnum(name[i]) && name[i] != '_') return false;
+	for(size_t i = 1; i < len; ++i)
+		if(!isalnum(name[i]) && name[i] != '_')
+			return false;
 	return true;
 }
 
@@ -195,56 +197,52 @@ unbounded_int eval(interpreter *inter, char *line) {
 	if(str == NULL || !is_arithmetic_expression(str)) return NaN;
 	tree *t = string_to_tree(str);
 	unbounded_int value = evaluate(t);
-	value = copy_unbounded_int(&value);
 	free_tree(t);
 	free(str);
 	return value;
 }
 
 void interpret(interpreter *inter) {
-	char buffer[1024], *tmp;
+	char *buffer = calloc(1024, sizeof(char));
 	do {
 		if(fgets(buffer, 1024, inter->input) == NULL) break;
-		if(is_empty(buffer) || buffer[0] == '#') continue;
+		if(isspace(*buffer) || *buffer == '#') continue;
 
-		size_t pos;
-		if(index_of(buffer, '=', &pos)) { // Assignment
-			// Parse
-			char *name = strip(tmp = substring(buffer, 0, pos));
-			free(tmp);
-			char *value = strip(tmp = substring(buffer, pos + 1, strlen(buffer)));
-			free(tmp);
+		char *pos = strchr(buffer, '=');
+		if(pos != NULL) {
+			*pos = '\0';
+			char *value = strip(pos + 1);
+			char *name = strip(buffer);
+
 			if(!valid_variable_name(name)) {
 				fprintf(inter->error, "Invalid variable name.\n");
 				continue;
 			}
 
-			// Evaluate
 			unbounded_int u = eval(inter, value);
 			if(isNaN(u)) {
 				fprintf(inter->error, "Invalid expression.\n");
 				continue;
 			}
 
-			// Assign
 			unbounded_int *v = assign(inter->memory, name, u);
-			if(v == NULL) fprintf(inter->error, "Variable %s already exists.\n", name);
+			if(v == NULL) fprintf(inter->error, "Failled to assign the value with the variable name");
 
 			free(name);
 			free(value);
 		} else if(strstr(buffer, "exit") != NULL) break;
 		else {
-			if(index_of(buffer, ' ', &pos)) {
-				char *command = strip(tmp = substring(buffer, 0, pos));
-				free(tmp);
+			if((pos = strchr(buffer, ' ')) != NULL) {
+				*pos = '\0';
+				char *command = strip(buffer);
 				if(strcmp(command, "print") == 0) {
-					char *name = strip(tmp = substring(buffer, pos + 1, strlen(buffer)));
+					char *name = strip(pos + 1);
 					print(inter, name);
-					free(tmp);
 					free(name);
 				} else fprintf(inter->error, "Unknown command: %s\n", command);
 				free(command);
 			}
 		}
 	} while(*buffer != EOF && *buffer != '\0' && strcmp(buffer, "exit") != 0);
+	free(buffer);
 }
