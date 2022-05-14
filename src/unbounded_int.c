@@ -74,36 +74,32 @@ static unbounded_int strip_unbounded_int(unbounded_int u) {
 	return u;
 }
 
-unbounded_int string2unbounded_int(char *str) {
+unbounded_int string2unbounded_int(const char *str) {
 	unbounded_int result = NaN;
-	str = strip(str);
-	size_t len = strlen(str);
+	char *c = strip(str), *p = c;
+	size_t len = strlen(c);
 	if(len > 0) {
-		size_t i = 0;
-		if(str[i] == '-' || str[i] == '+') result.signe = str[i++];
-		else if(isdigit(str[i])) result.signe = '+';
+		if(strchr("+-", *c)) result.signe = *(c++);
+		else if(isdigit(*c)) result.signe = '+';
 		else return result; // NaN
 
-		while(i < len) {
-			if(isdigit(str[i])) push_back(&result, str[i++]);
+		while(*c != '\0') {
+			if(isdigit(*c)) push_back(&result, *(c++));
 			else {
 				free_unbounded_int(&result);
 				break;
 			}
 		}
 	}
-	free(str);
+	free(p);
 	return strip_unbounded_int(result);
 }
 
 unbounded_int ll2unbounded_int(long long int i) {
-	if(i == 0) return string2unbounded_int("0");
+	if(i == 0) return ZERO;
 	long long n = i < 0 ? -i : i;
-	unsigned len = i < 0 ? 1 : 0;
-	while(n > 0) {
-		++len;
-		n /= 10;
-	}
+	unsigned len = i < 0;
+	while(n > 0) ++len, n /= 10;
 
 	char tmp[len + 1];
 	sprintf(tmp, "%lli", i);
@@ -122,16 +118,25 @@ char *unbounded_int2string(unbounded_int i) {
 }
 
 int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b) {
-	if(a.signe == '-' && b.signe == '+') return -1;
-	if(a.signe == '+' && b.signe == '-') return 1;
+	if(isNaN(a) || isNaN(b)) return -2; // when NaN == ? && ? == NaN && NaN == NaN
 
-	if(a.len < b.len) return a.signe == '-' ? 1 : -1;
-	if(a.len > b.len) return a.signe == '-' ? -1 : 1;
+	// if the signs are different
+	if(a.signe != b.signe) {
+		if(a.signe == '-') return -1; // then b.signe == '+'
+		if(a.signe == '+') return 1; // then b.signe == '-'
+	}
 
+	// If the lengths are different, it depends on the signe
+	if(a.len != b.len) {
+		if(a.len < b.len) return a.signe == '-' ? 1 : -1;
+		return a.signe == '-' ? -1 : 1;
+	}
+
+	// If the length and the signe are the same, it depends on the digits.
 	chiffre *p_a = a.premier, *p_b = b.premier;
 	while(p_a != NULL && p_b != NULL) {
 		int tmp = cpm(p_a->c, p_b->c);
-		if(tmp != 0)
+		if(tmp != 0) // if the digits are different, it depends on the signe
 			return a.signe == '-' ? -tmp : tmp;
 
 		p_a = p_a->suivant;
@@ -154,6 +159,7 @@ int unbounded_int_cmp_ll(unbounded_int a, long long int b) {
 
 static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe == b->signe) {
+		// if the signs are the same, we just need to sum the digits and take care of the hold.
 		unbounded_int r = { .signe=a->signe, .len=0, .premier=NULL, .dernier=NULL };
 		int hold = 0, tmp;
 
@@ -167,6 +173,7 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 			p_b = p_b->precedent;
 		}
 
+		// In the case an unbounded_int is longer than the other.
 		chiffre *p = p_a == NULL ? p_b : p_a;
 		while(p != NULL) {
 			tmp = ctoi(p->c) + hold;
@@ -176,6 +183,7 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 			p = p->precedent;
 		}
 
+		// In the case the hold is not 0.
 		if(hold != 0) push_front(&r, hold);
 		return r;
 	}
@@ -184,7 +192,9 @@ static unbounded_int add_same_sign(unbounded_int *a, unbounded_int *b) {
 
 static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 	if(a->signe != b->signe) {
+		// If the signs are different, we need to calculate the difference between the two.
 		unbounded_int r = NaN;
+		// The signe of the result is the signe of the bigger unbounded_int.
 		r.signe = (cmp_abs(*a, *b) == 1 ? a : b)->signe;
 		int hold = 0, tmp;
 
@@ -202,6 +212,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 			p_b = p_b->precedent;
 		}
 
+		// In the case an unbounded_int is longer than the other.
 		chiffre *p = p_a == NULL ? p_b : p_a;
 		while(p != NULL) {
 			int i = ctoi(p->c);
@@ -213,6 +224,7 @@ static unbounded_int add_diff_sign(unbounded_int *a, unbounded_int *b) {
 			p = p->precedent;
 		}
 
+		// In the case the hold is not 0.
 		if(hold != 0) push_front(&r, hold);
 		return r;
 	}
@@ -225,11 +237,12 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 	if(isZERO(b)) return copy_unbounded_int(&a);
 
 	int cmp = cmp_abs(a, b);
-	if(a.signe != b.signe && cmp == 0) return ZERO;
-
+	// If the signs are the same, we just need to sum the digits and take care of the hold.
 	if(a.signe == b.signe) return strip_unbounded_int(add_same_sign(&a, &b));
-	if(a.signe != b.signe) {
+	if(a.signe != b.signe) { // if the signs are different,
+		// we can return 0 if |a| == |b|
 		if(cmp == 0) return ZERO;
+		// or we need to calculate the difference between the two.
 		if(cmp == -1) return strip_unbounded_int(add_diff_sign(&b, &a));
 		if(cmp == 1) return strip_unbounded_int(add_diff_sign(&a, &b));
 	}
@@ -237,9 +250,9 @@ unbounded_int unbounded_int_somme(unbounded_int a, unbounded_int b) {
 }
 
 unbounded_int unbounded_int_difference(unbounded_int a, unbounded_int b) {
-	a.signe = '+', b.signe = '-';
+	// a - b = a + (-b) or a - (-b) = a + b
+	b.signe = b.signe == '-' ? '+' : '-';
 	unbounded_int r = unbounded_int_somme(a, b);
-	r.signe = '+';
 	return r;
 }
 
@@ -269,7 +282,7 @@ unbounded_int copy_unbounded_int(unbounded_int *a) {
 }
 
 static void left_shift(unbounded_int *u, long long unsigned n) {
-	if(!isZERO((*u)))
+	if(!isZERO(*u))
 		while(n-- > 0)
 			push_back(u, '0');
 }
@@ -289,7 +302,7 @@ static void pop_back(unbounded_int *u) {
 }
 
 static void right_shift(unbounded_int *u, long long unsigned n) {
-	if(!isZERO((*u)))
+	if(!isZERO(*u))
 		while(n-- > 0 && u->len > 0)
 			pop_back(u);
 }
@@ -319,21 +332,21 @@ unbounded_int unbounded_int_produit(unbounded_int a, unbounded_int b) {
 	if(isNaN(a) || isNaN(b)) return NaN;
 	if(isZERO(a) || isZERO(b)) return ZERO;
 
-	unbounded_int result = ZERO;
+	unbounded_int result = ZERO, inter, tmp;
 	result.signe = (a.signe != b.signe && (a.signe == '-' || b.signe == '-')) ? '-' : '+';
 
 	chiffre *c_b = b.dernier;
 	long long unsigned rand = 0;
 	while(c_b != NULL) {
 		if(c_b->c != '0') {
-			unbounded_int inter = unbounded_int_fois_chiffre(&a, c_b);
+			inter = unbounded_int_fois_chiffre(&a, c_b);
 			inter.signe = result.signe;
 			left_shift(&inter, rand);
 
-			unbounded_int tmp_bis = unbounded_int_somme(result, inter);
+			tmp = unbounded_int_somme(result, inter);
 			free_unbounded_int(&inter);
 			free_unbounded_int(&result);
-			result = tmp_bis;
+			result = tmp;
 		}
 
 		++rand;
@@ -348,21 +361,19 @@ unbounded_int unbounded_int_pow(unbounded_int u, unbounded_int n) {
 	if(isZERO(u)) return ZERO;
 	n = copy_unbounded_int(&n);
 
-	unbounded_int result = copy_unbounded_int(&u);
-	unbounded_int one = string2unbounded_int("1"), minus_one = string2unbounded_int("-1");
-	while(unbounded_int_cmp_unbounded_int(n, one) == 1) {
-		unbounded_int tmp = unbounded_int_produit(result, u);
+	unbounded_int result = copy_unbounded_int(&u), pas = string2unbounded_int("-1"), tmp;
+	while(n.len > 1 || n.premier->c > '1') {
+		tmp = unbounded_int_produit(result, u); // result = result * u
 		free_unbounded_int(&result);
 		result = tmp;
 
-		tmp = unbounded_int_somme(n, minus_one);
+		tmp = unbounded_int_somme(n, pas); // n = n - 1
 		free_unbounded_int(&n);
 		n = tmp;
 	}
 
 	free_unbounded_int(&n);
-	free_unbounded_int(&one);
-	free_unbounded_int(&minus_one);
+	free_unbounded_int(&pas);
 	return result;
 }
 

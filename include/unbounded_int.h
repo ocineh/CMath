@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 #define NaN ((unbounded_int){ .signe='*', .len=0, .premier=NULL, .dernier=NULL })
-#define ZERO (ll2unbounded_int(0))
+#define ZERO (string2unbounded_int("0"))
 #define isZERO(x) ((x).len == 1 && (x).premier->c == '0')
 #define isONE(x) ((x).len == 1 && (x).premier->c == '1')
 #define isNaN(a) ((a).signe == '*' || (a).len == 0 || (a).premier == NULL || (a).dernier == NULL)
@@ -41,13 +41,13 @@ extern void free_unbounded_int(unbounded_int *a);
 
 /**
  * Create an unbounded_int instance from a string.
- * /!\ If the string does not correspond to a number,
+ * /!\ The string need to correspond to the regex "^[+\-0-9][0-9]*$",
  * return an instance of unbounded_int with the field sign == '*'.
  *
  * @param str a string of characters of a number
  * @return an instance of unbounded_int
  */
-extern unbounded_int string2unbounded_int(char *str);
+extern unbounded_int string2unbounded_int(const char *str);
 
 /**
  * Create an unbounded_int instance from a `long long int`.
@@ -85,6 +85,7 @@ extern int unbounded_int_cmp_unbounded_int(unbounded_int a, unbounded_int b);
  * @return -1 if a is less than b.<br>
  *          1 if a is greater than b.<br>
  *          0 if a is equal to b.
+ *          -2 if a or b is not a number.
  */
 extern int unbounded_int_cmp_ll(unbounded_int a, long long b);
 
