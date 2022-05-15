@@ -4,17 +4,24 @@
 #include "strings.h"
 #include "arithmetic.h"
 
-typedef struct node {
+#define MAX_LOAD_FACTOR 0.75
+#define INITIAL_CAPACITY 8
+
+#define isMarked(mem, i) ((mem)->vars[i] != NULL && (mem)->vars[i]->name == NULL)
+#define isUsed(mem, i) ((mem)->vars[i] != NULL && (mem)->vars[i]->name != NULL)
+#define isFree(mem, i) ((mem)->vars[i] == NULL)
+
+typedef struct variable {
 	char *name;
 	unbounded_int value;
-	struct node *next;
-} node;
+} variable;
 
-typedef struct memory {
+struct memory {
 	size_t size;
-	node *head;
-	node *tail;
-} memory;
+	size_t used;
+	size_t marked;
+	variable **vars;
+};
 
 typedef struct interpreter {
 	memory *memory;
@@ -23,21 +30,47 @@ typedef struct interpreter {
 	FILE *error;
 } interpreter;
 
-static node *create_node(char *name, unbounded_int value) {
-	node *n = malloc(sizeof(node));
-	if(n == NULL) return NULL;
-	n->name = copy(name);
-	n->value = value;
-	n->next = NULL;
-	return n;
-}
-
 static memory *create_memory() {
 	memory *mem = malloc(sizeof(memory));
 	if(mem == NULL) return NULL;
-	mem->size = 0;
-	mem->head = mem->tail = NULL;
+	mem->size = INITIAL_CAPACITY, mem->used = 0, mem->marked = 0;
+	mem->vars = calloc(mem->size, sizeof(variable *));
 	return mem;
+}
+
+static size_t hash(const char *name, size_t size) {
+	if(name == NULL) return 0;
+	// djb2 hash function (http://www.cse.yorku.ca/~oz/hash.html)
+	size_t hash = 5381, len = strlen(name);
+	for(size_t i = 0; i < len; ++i)
+		hash = ((hash << 5) + hash) + (size_t) name[i];
+	return hash % size;
+}
+
+static variable *create_variable(const char *name, unbounded_int value) {
+	variable *v = calloc(1, sizeof(variable));
+	if(v == NULL) return NULL;
+	v->name = copy(name);
+	v->value = value;
+	return v;
+}
+
+static void resize_memory(memory *mem, size_t new_size) {
+	if(mem->used > new_size) return;
+	variable **vars = calloc(new_size, sizeof(variable *));
+	if(vars == NULL) return;
+
+	for(size_t i = 0; i < mem->size; ++i) {
+		if(isUsed(mem, i)) {
+			size_t h = hash(mem->vars[i]->name, new_size);
+			while(isUsed(mem, h))
+				h = (h + 1) % new_size;
+			vars[h] = mem->vars[i];
+		}
+	}
+
+	free(mem->vars);
+	mem->vars = vars, mem->size = new_size, mem->marked = 0;
 }
 
 interpreter *create_interpreter(FILE *input, FILE *output, FILE *error) {
@@ -58,20 +91,16 @@ interpreter *create_interpreter(FILE *input, FILE *output, FILE *error) {
 	return interp;
 }
 
-static void destroy_node(node *n) {
-	free(n->name);
-	free_unbounded_int(&n->value);
-	free(n);
-}
-
 static void destroy_memory(memory *mem) {
 	if(mem == NULL) return;
-	node *curr = mem->head;
-	while(curr != NULL) {
-		node *next = curr->next;
-		destroy_node(curr);
-		curr = next;
+	for(size_t i = 0; i < mem->size; ++i) {
+		if(isUsed(mem, i)) {
+			free(mem->vars[i]->name);
+			free_unbounded_int(&mem->vars[i]->value);
+			free(mem->vars[i]);
+		}
 	}
+	free(mem->vars);
 	free(mem);
 }
 
@@ -96,42 +125,42 @@ bool valid_variable_name(char *name) {
 	return true;
 }
 
-static node *get_node(memory *mem, char *name) {
-	node *curr = mem->head;
-	while(curr != NULL) {
-		if(strcmp(curr->name, name) == 0) return curr;
-		curr = curr->next;
+unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
+	if(mem == NULL || name == NULL || isNaN(u))
+		return NULL;
+	if(!valid_variable_name(name))
+		return NULL;
+
+	long double load = (long double) mem->used * MAX_LOAD_FACTOR;
+	if((long double) (mem->used + mem->marked) >= load)
+		resize_memory(mem, mem->size);
+	else if((long double) mem->used >= load)
+		resize_memory(mem, mem->size * 2);
+
+	size_t h = hash(name, mem->size);
+	while(isUsed(mem, h)) {
+		if(strcmp(name, mem->vars[h]->name) == 0) {
+			free_unbounded_int(&mem->vars[h]->value);
+			mem->vars[h]->value = u;
+			return &mem->vars[h]->value;
+		}
+		h = (h + 1) % mem->size;
+	}
+
+	if(isFree(mem, h) || isMarked(mem, h)) {
+		mem->vars[h] = create_variable(name, u);
+		++mem->used;
+		return &mem->vars[h]->value;
 	}
 	return NULL;
 }
 
-unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
-	if(mem == NULL || name == NULL || isNaN(u)) return NULL;
-	if(!valid_variable_name(name)) return NULL;
-	node *n;
-	if((n = get_node(mem, name)) != NULL) {
-		free_unbounded_int(&n->value);
-		n->value = u;
-		return &n->value;
-	}
-
-	n = create_node(name, u);
-	if(n == NULL) return NULL;
-	mem->size++;
-	if(mem->head == NULL)
-		mem->head = mem->tail = n;
-	else {
-		mem->tail->next = n;
-		mem->tail = n;
-	}
-	return &n->value;
-}
-
 unbounded_int *value_of(memory *mem, char *name) {
-	node *curr = mem->head;
-	while(curr != NULL) {
-		if(strcmp(curr->name, name) == 0) return &curr->value;
-		curr = curr->next;
+	size_t h = hash(name, mem->size);
+	while(!isFree(mem, h)) {
+		if(strcmp(name, mem->vars[h]->name) == 0)
+			return &mem->vars[h]->value;
+		h = (h + 1) % mem->size;
 	}
 	return NULL;
 }
@@ -222,7 +251,7 @@ void interpret(interpreter *inter) {
 
 			unbounded_int u = eval(inter, value);
 			if(isNaN(u)) {
-				fprintf(inter->error, "Invalid expression.\n");
+				fprintf(inter->error, "Invalid expression: %s = %s\n", name, value);
 				continue;
 			}
 
