@@ -63,8 +63,7 @@ static void resize_memory(memory *mem, size_t new_size) {
 	for(size_t i = 0; i < mem->size; ++i) {
 		if(isUsed(mem, i)) {
 			size_t h = hash(mem->vars[i]->name, new_size);
-			while(isUsed(mem, h))
-				h = (h + 1) % new_size;
+			while(vars[h] != NULL) h = (h + 1) % new_size;
 			vars[h] = mem->vars[i];
 		}
 	}
@@ -131,11 +130,11 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	if(!valid_variable_name(name))
 		return NULL;
 
-	long double load = (long double) mem->used * MAX_LOAD_FACTOR;
-	if((long double) (mem->used + mem->marked) >= load)
-		resize_memory(mem, mem->size);
-	else if((long double) mem->used >= load)
+	long long load = (long long) ((long double) mem->size * MAX_LOAD_FACTOR);
+	if(mem->used >= load)
 		resize_memory(mem, mem->size * 2);
+	else if(mem->used + mem->marked >= load)
+		resize_memory(mem, mem->size);
 
 	size_t h = hash(name, mem->size);
 	while(isUsed(mem, h)) {
