@@ -31,7 +31,7 @@ typedef struct interpreter {
 } interpreter;
 
 static memory *create_memory() {
-	memory *mem = malloc(sizeof(memory));
+	memory *mem = calloc(1, sizeof(memory));
 	if(mem == NULL) return NULL;
 	mem->size = INITIAL_CAPACITY, mem->used = 0, mem->marked = 0;
 	mem->vars = calloc(mem->size, sizeof(variable *));
@@ -154,10 +154,28 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	return NULL;
 }
 
+bool un_assign(memory *mem, char *name) {
+	if(mem == NULL || name == NULL) return NULL;
+	if(!valid_variable_name(name)) return NULL;
+
+	size_t h = hash(name, mem->size);
+	while(!isFree(mem, h)) {
+		if(mem->vars[h]->name != NULL && strcmp(name, mem->vars[h]->name) == 0) {
+			free_unbounded_int(&mem->vars[h]->value);
+			free(mem->vars[h]->name);
+			mem->vars[h]->name = NULL;
+			--mem->used, ++mem->marked;
+			return true;
+		}
+		h = (h + 1) % mem->size;
+	}
+	return false;
+}
+
 unbounded_int *value_of(memory *mem, char *name) {
 	size_t h = hash(name, mem->size);
 	while(!isFree(mem, h)) {
-		if(strcmp(name, mem->vars[h]->name) == 0)
+		if(mem->vars[h]->name != NULL && strcmp(name, mem->vars[h]->name) == 0)
 			return &mem->vars[h]->value;
 		h = (h + 1) % mem->size;
 	}
@@ -231,6 +249,37 @@ unbounded_int eval(interpreter *inter, char *line) {
 	return value;
 }
 
+static void interpret_command(interpreter *inter, char *command, char *args) {
+	if(strcmp(command, "print") == 0)
+		print(inter, args);
+	else if(strcmp(command, "free") == 0) {
+		if(!un_assign(inter->memory, args))
+			fprintf(inter->error, "The variable %s cannot be freed.\n", args);
+	} else if(strcmp(command, "cmp") == 0) {
+		char *pos = strchr(args, ' ');
+		if(pos == NULL) {
+			fprintf(inter->error, "The command cmp requires two arguments.\n");
+			return;
+		}
+
+		*pos = '\0';
+		char *first = strip(args), *second = strip(pos + 1);
+		unbounded_int *u = value_of(inter->memory, first);
+		unbounded_int *v = value_of(inter->memory, second);
+		if(u == NULL || v == NULL)
+			fprintf(inter->error, "Variable %s not found.\n", u == NULL ? first : second);
+		else {
+			int cmp = unbounded_int_cmp_unbounded_int(*u, *v);
+			if(cmp == 0) fprintf(inter->output, "%s is equal to %s.\n", first, second);
+			else if(cmp < 0) fprintf(inter->output, "%s is less than %s.\n", first, second);
+			else fprintf(inter->output, "%s is greater than %s.\n", first, second);
+		}
+
+		free(first);
+		free(second);
+	} else fprintf(inter->error, "Unknown command: %s\n", command);
+}
+
 void interpret(interpreter *inter) {
 	char *buffer = calloc(1024, sizeof(char));
 	do {
@@ -264,12 +313,10 @@ void interpret(interpreter *inter) {
 			if((pos = strchr(buffer, ' ')) != NULL) {
 				*pos = '\0';
 				char *command = strip(buffer);
-				if(strcmp(command, "print") == 0) {
-					char *name = strip(pos + 1);
-					print(inter, name);
-					free(name);
-				} else fprintf(inter->error, "Unknown command: %s\n", command);
+				char *args = strip(pos + 1);
+				interpret_command(inter, command, args);
 				free(command);
+				free(args);
 			}
 		}
 	} while(*buffer != EOF && *buffer != '\0' && strcmp(buffer, "exit") != 0);

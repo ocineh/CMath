@@ -58,6 +58,16 @@ extern bool valid_variable_name(char *name);
 extern unbounded_int *assign(memory *mem, char *name, unbounded_int u);
 
 /**
+ * Un-assign the value with the name of the variable.
+ * If the name is not used or the variable name is not valid the operation will fail.
+ *
+ * @param mem the memory where the variable is stored
+ * @param name the name of the variable
+ * @return true if the operation succeeds otherwise false
+ */
+extern bool un_assign(memory *mem, char *name);
+
+/**
  * Get the value of a variable from its name.
  *
  * @param mem the memory where the variable is stored
