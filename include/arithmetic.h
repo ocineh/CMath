@@ -4,10 +4,9 @@
 #include "unbounded_int.h"
 
 /**
- * Represents a arithmetic expression in the form of a tree.
- * Each node is either an operator with two children or a number.
+ * Represents a arithmetic expression in the form of a list.
  */
-typedef struct tree tree;
+typedef struct arithmetic arithmetic;
 
 /**
  * Create a new tree from a string.
@@ -15,51 +14,28 @@ typedef struct tree tree;
  * @param str a string representing an arithmetic expression
  * @return a new tree or NULL if it failed
  */
-extern tree *string_to_tree(char *str);
+extern arithmetic *string_to_arithmetic(char *str);
 
 /**
  * Transform a tree into an arithmetic expression.
  *
- * @param t a tree
+ * @param t an arithmetic list
  * @return a string
  */
-extern char *tree_to_string(tree *t);
+extern char *arithmetic_to_string(arithmetic *a);
 
 /**
  * Evaluate all the nodes of a tree until it remains only one with a value.
  *
- * @param t a tree
+ * @param a an arithmetic list
  */
-extern unbounded_int evaluate(tree *t);
+extern unbounded_int evaluate(arithmetic *a);
 
 /**
  * Free a tree and all its nodes recursively.
  *
- * @param t a tree
+ * @param t an arithmetic list
  */
-extern void free_tree(tree *t);
-
-/**
- * Calculate the number of nodes in a tree.
- *
- * @param t a tree
- * @return the number of nodes
- */
-extern size_t tree_size(tree *t);
-
-/**
- * Calculate the depth of a tree.
- *
- * @param t a tree
- * @return the depth of the tree
- */
-extern size_t tree_depth(tree *t);
-
-/**
- * Create a file in the dot language to visualize a tree.
- * @param t a tree
- * @param filename the name where the data will be written
- */
-extern void tree_to_dot(tree *t, char *filename);
+extern void free_arithmetic(arithmetic *a);
 
 #endif //PROJET_ARITHMETIC_H

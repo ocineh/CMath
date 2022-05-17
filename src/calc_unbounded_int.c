@@ -224,9 +224,9 @@ static char *replace_variable_name_by_value(interpreter *inter, char *str) {
 unbounded_int eval(interpreter *inter, char *line) {
 	char *str = replace_variable_name_by_value(inter, line);
 	if(str == NULL || !is_arithmetic_expression(str)) return NaN;
-	tree *t = string_to_tree(str);
-	unbounded_int value = evaluate(t);
-	free_tree(t);
+	arithmetic *a = string_to_arithmetic(str);
+	unbounded_int value = evaluate(a);
+	free_arithmetic(a);
 	free(str);
 	return value;
 }
