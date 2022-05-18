@@ -3,13 +3,13 @@
 #include "strings.h"
 
 typedef enum operator {
-	ADD, SUB, MUL, POW, DIV, MOD, NONE
+	ADD = '+', SUB = '-', MUL = '*', POW = '^', DIV = '/', MOD = '%', NONE = '\0'
 } operator;
 
 typedef struct cell {
 	operator operator;
-	struct cell *prev;
 	struct cell *next;
+	struct cell *prev;
 	unbounded_int value;
 } cell;
 
@@ -26,7 +26,7 @@ static cell *operator_to_node(operator op) {
 }
 
 static cell *value_to_node(unbounded_int value) {
-	cell *n = malloc(sizeof(cell));
+	cell *n = calloc(1, sizeof(cell));
 	if(n == NULL) return NULL;
 	n->operator = NONE;
 	n->value = value;
@@ -42,13 +42,13 @@ static void free_node(cell *n) {
 
 void free_arithmetic(arithmetic *a) {
 	if(a != NULL) {
-		cell *actual = a->first;
-		while(actual != NULL) {
-			cell *next = actual->next;
-			free_node(actual);
-			actual = next;
+		while(a->first != NULL) {
+			cell *tmp = a->first;
+			a->first = a->first->next;
+			free_node(tmp);
 		}
 		free(a);
+		a = NULL;
 	}
 }
 
@@ -64,7 +64,7 @@ static operator char_to_operator(char c) {
 	}
 }
 
-#define is_operator(c) ((c) == '+' || (c) == '-' || (c) == '*' || (c) == '/' || (c) == '^' || (c) == '%')
+#define is_operator(c) (strchr((char[]){ADD, SUB, MUL, DIV, POW, MOD, '\0'}, (c)) != NULL)
 
 static bool is_unary_operator(const char *s, size_t i) {
 	return strchr("+-", *s) && (i == 0 || is_operator(s[i - 1])) && isdigit(s[i + 1]);
@@ -171,22 +171,10 @@ static unbounded_int (*operator_to_function(operator op))(unbounded_int, unbound
 	}
 }
 
-static char operator_to_char(operator op) {
-	switch(op) {
-		case ADD: return '+';
-		case SUB: return '-';
-		case MUL: return '*';
-		case DIV: return '/';
-		case MOD: return '%';
-		case POW: return '^';
-		default: return '\0';
-	}
-}
-
 static void evaluate_(arithmetic *a, char *match) {
 	cell *actual = a->first;
 	while(actual != NULL) {
-		if(actual->operator != NONE && strchr(match, operator_to_char(actual->operator)) != NULL) {
+		if(actual->operator != NONE && strchr(match, actual->operator) != NULL) {
 			unbounded_int (*f)(unbounded_int, unbounded_int) = operator_to_function(actual->operator);
 			unbounded_int res = f(actual->prev->value, actual->next->value);
 
@@ -200,18 +188,21 @@ static void evaluate_(arithmetic *a, char *match) {
 			else a->last = n;
 
 			// Free the memory of the nodes
-			free_node(actual->prev);
-			free_node(actual->next);
-			actual = n->next;
-		} else actual = actual->next;
+			free_node(actual->prev), actual->prev = NULL;
+			free_node(actual->next), actual->next = NULL;
+			free_node(actual), actual = NULL;
+
+			actual = n;
+		}
+		actual = actual->next;
 	}
 }
 
 unbounded_int evaluate(arithmetic *a) {
 	if(a != NULL && a->first != NULL) {
-		evaluate_(a, "^");
-		evaluate_(a, "*/%");
-		evaluate_(a, "+-");
+		evaluate_(a, (char[]) { POW, '\0' });
+		evaluate_(a, (char[]) { MUL, DIV, MOD, '\0' });
+		evaluate_(a, (char[]) { ADD, SUB, '\0' });
 		if(a->first == a->last)
 			return copy_unbounded_int(&a->first->value);
 	}
