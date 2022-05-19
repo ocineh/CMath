@@ -280,45 +280,50 @@ static void interpret_command(interpreter *inter, char *command, char *args) {
 	} else fprintf(inter->error, "Unknown command: %s\n", command);
 }
 
+static void interpret_assignment(interpreter *inter, char *name, char *value) {
+	if(!valid_variable_name(name)) {
+		fprintf(inter->error, "Invalid variable name.\n");
+		return;
+	}
+
+	unbounded_int u = eval(inter, value);
+	if(isNaN(u)) {
+		fprintf(inter->error, "Invalid expression: %s = %s\n", name, value);
+		return;
+	}
+
+	unbounded_int *v = assign(inter->memory, name, u);
+	if(v == NULL) fprintf(inter->error, "Failled to assign the value with the variable name");
+}
+
+#define BUFFER_SIZE 1024
+
 void interpret(interpreter *inter) {
-	char *buffer = calloc(1024, sizeof(char));
+	char buffer[BUFFER_SIZE], *line = calloc(1, sizeof(char));
 	do {
-		if(fgets(buffer, 1024, inter->input) == NULL) break;
-		if(isspace(*buffer) || *buffer == '#') continue;
-
-		char *pos = strchr(buffer, '=');
-		if(pos != NULL) {
-			*pos = '\0';
-			char *value = strip(pos + 1);
-			char *name = strip(buffer);
-
-			if(!valid_variable_name(name)) {
-				fprintf(inter->error, "Invalid variable name.\n");
-				continue;
-			}
-
-			unbounded_int u = eval(inter, value);
-			if(isNaN(u)) {
-				fprintf(inter->error, "Invalid expression: %s = %s\n", name, value);
-				continue;
-			}
-
-			unbounded_int *v = assign(inter->memory, name, u);
-			if(v == NULL) fprintf(inter->error, "Failled to assign the value with the variable name");
-
-			free(name);
-			free(value);
-		} else if(strstr(buffer, "exit") != NULL) break;
-		else {
-			if((pos = strchr(buffer, ' ')) != NULL) {
-				*pos = '\0';
-				char *command = strip(buffer);
-				char *args = strip(pos + 1);
-				interpret_command(inter, command, args);
-				free(command);
-				free(args);
-			}
+		// Read the input until the end of the line
+		*buffer = '\0';
+		free(line), line = calloc(1, sizeof(char));
+		while(strchr(buffer, '\n') == NULL) {
+			fgets(buffer, BUFFER_SIZE, inter->input);
+			if(feof(inter->input)) return;
+			char *tmp = concat(line, buffer);
+			free(line), line = tmp;
 		}
-	} while(*buffer != EOF && *buffer != '\0' && strcmp(buffer, "exit") != 0);
-	free(buffer);
+		if(is_empty(line) || *line == '#') continue;
+
+		// Interpret the line
+		char *pos = strchr(line, '=');
+		if(pos != NULL) { // Assignment
+			*pos = '\0';
+			char *name = strip(line), *value = strip(pos + 1);
+			interpret_assignment(inter, name, value);
+			free(name), free(value);
+		} else if((pos = strchr(line, ' ')) != NULL) { // Command (print, free, cmp)
+			*pos = '\0';
+			char *command = strip(line), *args = strip(pos + 1);
+			interpret_command(inter, command, args);
+			free(command), free(args);
+		}
+	} while(strcmp(line, "exit") != 0);
 }
