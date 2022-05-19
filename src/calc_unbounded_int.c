@@ -112,18 +112,6 @@ void destroy_interpreter(interpreter *inter) {
 	free(inter);
 }
 
-bool valid_variable_name(char *name) {
-	if(name == NULL) return false;
-	size_t len = strlen(name);
-	if(len == 0) return false;
-
-	if(!isalpha(name[0])) return false;
-	for(size_t i = 1; i < len; ++i)
-		if(!isalnum(name[i]) && name[i] != '_')
-			return false;
-	return true;
-}
-
 unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	if(mem == NULL || name == NULL || isNaN(u))
 		return NULL;

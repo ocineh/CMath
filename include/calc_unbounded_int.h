@@ -38,15 +38,6 @@ extern void destroy_interpreter(interpreter *inter);
 extern void interpret(interpreter *inter);
 
 /**
- * Checks if the variable name is valid.
- * The equivalent in regex is `[a-zA-Z_][a-zA-Z_0-9]*`
- *
- * @param name the name of a variable
- * @return if the name is valid
- */
-extern bool valid_variable_name(char *name);
-
-/**
  * Assign the value with the name of the variable.
  * If the name is already used or the variable name is not valid the operation will fail.
  *

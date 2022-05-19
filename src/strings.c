@@ -1,3 +1,6 @@
+#include "arithmetic.h"
+#include <ctype.h>
+#include <calc_unbounded_int.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include "strings.h"
@@ -97,6 +100,18 @@ bool is_empty(char *s) {
 	if(s == NULL) return true;
 	while(*s != '\0')
 		if(!isspace(*(s++)))
+			return false;
+	return true;
+}
+
+bool valid_variable_name(char *name) {
+	if(name == NULL) return false;
+	size_t len = strlen(name);
+	if(len == 0) return false;
+
+	if(!isalpha(name[0])) return false;
+	for(size_t i = 1; i < len; ++i)
+		if(!isalnum(name[i]) && name[i] != '_')
 			return false;
 	return true;
 }

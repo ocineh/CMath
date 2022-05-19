@@ -62,4 +62,13 @@ extern char *remove_spaces(const char *s);
 
 extern bool is_empty(char *s);
 
+/**
+ * Checks if the variable name is valid.
+ * The equivalent in regex is `[a-zA-Z_][a-zA-Z_0-9]*`
+ *
+ * @param name the name of a variable
+ * @return if the name is valid
+ */
+extern bool valid_variable_name(char *name);
+
 #endif //PROJET_STRINGS_H
