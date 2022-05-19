@@ -92,3 +92,11 @@ char *remove_spaces(const char *s) {
 	}
 	return res;
 }
+
+bool is_empty(char *s) {
+	if(s == NULL) return true;
+	while(*s != '\0')
+		if(!isspace(*(s++)))
+			return false;
+	return true;
+}

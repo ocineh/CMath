@@ -60,4 +60,6 @@ extern bool is_arithmetic_expression(const char *s);
  */
 extern char *remove_spaces(const char *s);
 
+extern bool is_empty(char *s);
+
 #endif //PROJET_STRINGS_H
