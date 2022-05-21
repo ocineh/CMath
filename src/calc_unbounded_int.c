@@ -287,18 +287,24 @@ static void interpret_assignment(interpreter *inter, char *name, char *value) {
 #define BUFFER_SIZE 1024
 
 void interpret(interpreter *inter) {
-	char buffer[BUFFER_SIZE], *line = calloc(1, sizeof(char));
+	char buffer[BUFFER_SIZE], *line;
 	do {
 		// Read the input until the end of the line
 		*buffer = '\0';
-		free(line), line = calloc(1, sizeof(char));
+		line = calloc(1, sizeof(char));
 		while(strchr(buffer, '\n') == NULL) {
 			fgets(buffer, BUFFER_SIZE, inter->input);
-			if(feof(inter->input)) return;
+			if(feof(inter->input)) {
+				free(line);
+				return;
+			}
 			char *tmp = concat(line, buffer);
 			free(line), line = tmp;
 		}
-		if(is_empty(line) || *line == '#') continue;
+		if(is_empty(line) || *line == '#') {
+			free(line);
+			continue;
+		}
 
 		// Interpret the line
 		char *pos = strchr(line, '=');
@@ -310,8 +316,14 @@ void interpret(interpreter *inter) {
 		} else if((pos = strchr(line, ' ')) != NULL) { // Command (print, free, cmp)
 			*pos = '\0';
 			char *command = strip(line), *args = strip(pos + 1);
+			if(strcmp("exit", command) == 0) {
+				free(command), free(args), free(line);
+				return;
+			}
+
 			interpret_command(inter, command, args);
 			free(command), free(args);
 		}
-	} while(strcmp(line, "exit") != 0);
+		free(line);
+	} while(true);
 }

@@ -1,7 +1,7 @@
 .DEFAULT_GOAL: help
 
 COMPILER=gcc
-OPTIONS=-std=gnu11 -Iinclude -pedantic -Wall -Wextra -Wshadow -Wconversion -Wunreachable-code
+OPTIONS=-std=gnu11 -Iinclude -pedantic -Wall -g -Wextra -Wshadow -Wconversion -Wunreachable-code
 COMPILE=$(COMPILER) $(OPTIONS) -O3
 SOURCE_FILES = $(wildcard src/*.c)
 OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))

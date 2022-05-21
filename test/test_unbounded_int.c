@@ -28,7 +28,7 @@ static long long random_ll(long long min, long long max) {
 
 static size_t len(long long n) {
 	if(n == 0) return 1;
-	size_t len = 0;
+	size_t len = n < 0 ? 1 : 0;
 	while(n != 0)
 		n /= 10, ++len;
 	return len + 1;
@@ -36,7 +36,7 @@ static size_t len(long long n) {
 
 static char *ll_to_string(long long n) {
 	size_t size = len(n);
-	char *s = calloc(size, sizeof(char));
+	char *s = calloc(size + 1, sizeof(char));
 	if(s == NULL) return NULL;
 	sprintf(s, "%lld", n);
 	return s;

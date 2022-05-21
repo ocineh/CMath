@@ -1,12 +1,12 @@
 #include "arithmetic.h"
 #include <ctype.h>
-#include <calc_unbounded_int.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include "strings.h"
 
 char *strip(const char *c) {
 	if(!c) return NULL;
+	if(*c == '\0') return copy("");
 	size_t begin = 0;
 	while(isspace(c[begin])) begin++;
 
@@ -16,7 +16,7 @@ char *strip(const char *c) {
 	size_t len = begin <= end ? end - begin + 1 : 0;
 	char *new = calloc(len + 1, sizeof(char));
 	if(new == NULL) return NULL;
-	if(len > 0) memmove(new, c + begin, len);
+	memmove(new, c + begin, len);
 	return new;
 }
 

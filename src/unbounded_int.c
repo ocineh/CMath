@@ -76,22 +76,25 @@ static unbounded_int strip_unbounded_int(unbounded_int u) {
 
 unbounded_int string2unbounded_int(const char *str) {
 	unbounded_int result = NaN;
-	char *c = strip(str), *p = c;
-	size_t len = strlen(c);
+	char *tmp = strip(str);
+	size_t len = strlen(tmp), i = 0;
 	if(len > 0) {
-		if(strchr("+-", *c)) result.signe = *(c++);
-		else if(isdigit(*c)) result.signe = '+';
-		else return result; // NaN
+		if(strchr("+-", tmp[i])) result.signe = tmp[i++];
+		else if(isdigit(tmp[i])) result.signe = '+';
+		else {
+			free(tmp);
+			return result; // NaN
+		}
 
-		while(*c != '\0') {
-			if(isdigit(*c)) push_back(&result, *(c++));
+		while(tmp[i] != '\0') {
+			if(isdigit(tmp[i])) push_back(&result, tmp[i++]);
 			else {
 				free_unbounded_int(&result);
 				break;
 			}
 		}
 	}
-	free(p);
+	free(tmp);
 	return strip_unbounded_int(result);
 }
 
