@@ -9,7 +9,7 @@ OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))
 help:
 	@echo "Usage: make [target]"
 	@echo "Available targets:"
-	@echo "  library: Create the library of the project"
+	@echo "  library: Build the library of the project"
 	@echo "  build: Build the command line program"
 	@echo "  run-example: Run the program with a sample input"
 	@echo "  test: Run the tests"
