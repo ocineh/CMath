@@ -118,7 +118,7 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	if(!valid_variable_name(name))
 		return NULL;
 
-	long long load = (long long) ((long double) mem->size * MAX_LOAD_FACTOR);
+	size_t load = (size_t) ((long double) mem->size * MAX_LOAD_FACTOR);
 	if(mem->used >= load)
 		resize_memory(mem, mem->size * 2);
 	else if(mem->used + mem->marked >= load)
