@@ -5,75 +5,95 @@
 
 // Test the creation of an unbounded int from a string
 
-extern bool test_create_uint_from_string_1(void);
-extern bool test_create_uint_from_string_2(void);
-extern bool test_create_uint_from_string_with_invalid_string(void);
-extern bool test_create_uint_from_string_with_invalid_string_2(void);
+extern bool test_create_uint_from_string_random_positive(void);
+extern bool test_create_uint_from_string_random_negative(void);
+extern bool test_create_uint_from_string_big_positive(void);
+extern bool test_create_uint_from_string_big_negative(void);
+extern bool test_create_uint_from_string_with_invalid_string_with_letter(void);
+extern bool test_create_uint_from_string_with_empty_string(void);
 
 // Test the creation of an unbounded int from a long long int
 
-extern bool test_create_uint_from_ll_1(void);
-extern bool test_create_uint_from_ll_2(void);
+extern bool test_create_uint_from_ll_random_positive(void);
+extern bool test_create_uint_from_ll_random_negative(void);
 
 // Test the creation of a string from an unbounded int
 
-extern bool test_create_string_from_uint_1(void);
-extern bool test_create_string_from_uint_2(void);
+extern bool test_create_string_from_uint_random_positive(void);
+extern bool test_create_string_from_uint_random_negative(void);
 
 // Test the comparison of an unbounded int with another unbounded int or a long long int
 
-extern bool test_uint_cmp_with_uint_1(void);
-extern bool test_uint_cmp_with_uint_2(void);
-extern bool test_uint_cmp_with_uint_3(void);
-extern bool test_uint_cmp_with_ll_1(void);
-extern bool test_uint_cmp_with_ll_2(void);
-extern bool test_uint_cmp_with_ll_3(void);
+extern bool test_uint_cmp_with_uint_positive(void);
+extern bool test_uint_cmp_with_uint_negative(void);
+extern bool test_uint_cmp_with_uint_positive_and_negative(void);
+extern bool test_uint_cmp_with_ll_positive(void);
+extern bool test_uint_cmp_with_ll_negative(void);
+extern bool test_uint_cmp_with_ll_positive_and_negative(void);
+extern bool test_uint_cmp_with_ll_negative_and_positive(void);
 
 // Test the sum of two unbounded int
 
-extern bool test_uint_sum_1(void);
-extern bool test_uint_sum_2(void);
-extern bool test_uint_sum_3(void);
-extern bool test_uint_sum_4(void);
-extern bool test_uint_sum_5(void);
+extern bool test_uint_sum_random_positive_and_zero(void);
+extern bool test_uint_sum_random_negative_and_zero(void);
+extern bool test_uint_sum_random_positive(void);
+extern bool test_uint_sum_random_negative(void);
+extern bool test_uint_sum_random_positive_and_negative(void);
+extern bool test_uint_sum_big_positive(void);
+extern bool test_uint_sum_big_negative(void);
+extern bool test_uint_sum_big_positive_and_negative(void);
 
 // Test the product of two unbounded int
 
-extern bool test_uint_produit_1(void);
-extern bool test_uint_produit_2(void);
-extern bool test_uint_produit_3(void);
-extern bool test_uint_produit_4(void);
-extern bool test_uint_produit_5(void);
+extern bool test_uint_produit_random_number_and_zero(void);
+extern bool test_uint_produit_random_number_with_one(void);
+extern bool test_uint_produit_random_positive(void);
+extern bool test_uint_produit_random_negative(void);
+extern bool test_uint_produit_random_negative_and_positive(void);
+extern bool test_uint_produit_big_positive(void);
+extern bool test_uint_produit_big_negative(void);
+extern bool test_uint_produit_big_positive_and_negative(void);
 
 // Test the power of an unbounded int by another unbounded int
 
-extern bool test_uint_pow_1(void);
-extern bool test_uint_pow_2(void);
-extern bool test_uint_pow_3(void);
-extern bool test_uint_pow_4(void);
-extern bool test_uint_pow_5(void);
+extern bool test_uint_pow_random_number_and_zero(void);
+extern bool test_uint_pow_positive(void);
+extern bool test_uint_pow_positive_and_negative(void);
+extern bool test_uint_pow_negative(void);
+extern bool test_uint_pow_negative_and_positive(void);
 
 // Test the quotient of an unbounded int by another unbounded int
 
-extern bool test_uint_quotient_1(void);
-extern bool test_uint_quotient_2(void);
-extern bool test_uint_quotient_3(void);
-extern bool test_uint_quotient_4(void);
-extern bool test_uint_quotient_5(void);
+extern bool test_uint_quotient_random_positive_or_negative_and_zero(void);
+extern bool test_uint_quotient_random_positive(void);
+extern bool test_uint_quotient_random_negative(void);
+extern bool test_uint_quotient_random_negative_and_positive(void);
+extern bool test_uint_quotient_random_positive_and_negative(void);
+extern bool test_uint_quotient_big_positive(void);
+extern bool test_uint_quotient_big_negative(void);
+extern bool test_uint_quotient_big_positive_and_negative(void);
+extern bool test_uint_quotient_big_negative_and_positive(void);
 
 // Test the modulo of an unbounded int by another unbounded int
 
-extern bool test_uint_modulo_1(void);
-extern bool test_uint_modulo_2(void);
-extern bool test_uint_modulo_3(void);
-extern bool test_uint_modulo_4(void);
-extern bool test_uint_modulo_5(void);
+extern bool test_uint_modulo_positive_or_negative_and_zero(void);
+extern bool test_uint_modulo_positive(void);
+extern bool test_uint_modulo_negative(void);
+extern bool test_uint_modulo_negative_and_positive(void);
+extern bool test_uint_modulo_positive_and_negative(void);
+extern bool test_uint_modulo_big_positive(void);
+extern bool test_uint_modulo_big_negative(void);
+extern bool test_uint_modulo_big_positive_and_negative(void);
 
 // Test the difference of two unbounded int
 
-extern bool test_uint_difference_1(void);
-extern bool test_uint_difference_2(void);
-extern bool test_uint_difference_3(void);
-extern bool test_uint_difference_4(void);
+extern bool test_uint_difference_random_positive_or_negative_and_zero(void);
+extern bool test_uint_difference_random_positive(void);
+extern bool test_uint_difference_random_negative(void);
+extern bool test_uint_difference_random_negative_and_positive(void);
+extern bool test_uint_difference_random_positive_and_negative(void);
+extern bool test_uint_difference_big_positive(void);
+extern bool test_uint_difference_big_negative(void);
+extern bool test_uint_difference_big_positive_and_negative(void);
 
 #endif //PROJET_TEST_UNBOUNDED_INT_H

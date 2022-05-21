@@ -13,11 +13,10 @@ char *strip(const char *c) {
 	size_t end = strlen(c) - 1;
 	while(end > 0 && isspace(c[end])) end--;
 
-	if(begin > end) return "";
-	size_t len = end - begin + 1;
+	size_t len = begin <= end ? end - begin + 1 : 0;
 	char *new = calloc(len + 1, sizeof(char));
 	if(new == NULL) return NULL;
-	memmove(new, c + begin, len);
+	if(len > 0) memmove(new, c + begin, len);
 	return new;
 }
 
