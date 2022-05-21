@@ -78,7 +78,7 @@ make build
 3. run the project
 
 ```shell
-./build/app -i <FILE> -o <FILE> -e <FILE> 
+./build/app [-i <FILE>] [-o <FILE>] [-e <FILE>] 
 ```
 
 4. run the tests
@@ -110,3 +110,5 @@ make test
     - [x] (Re)Assign a variable name with a value
     - [x] Evaluate an expression (arithmetic or assignment)
     - [x] Print a variable
+    - [x] Free a variable
+    - [x] Compare two variables
