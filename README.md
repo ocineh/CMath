@@ -42,12 +42,12 @@ written to **stderr**.
 ├─ src/                    (The source code of the library)
 │  ├─ arithmetic.c
 │  ├─ calc_unbounded_int.c
-│  ├─ strings.c
+│  ├─ utils.c
 │  └─ unbounded_int.c
 ├─ include/                (The header files of the library)
 │  ├─ arithmetic.h
 │  ├─ calc_unbounded_int.h
-│  ├─ strings.h
+│  ├─ utils.h
 │  └─ unbounded_int.h
 ├─ test/                   (The tests of the library)
 │  ├─ tests.c

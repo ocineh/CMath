@@ -2,7 +2,7 @@
 #include <limits.h>
 #include "test_unbounded_int.h"
 #include "unbounded_int.h"
-#include "strings.h"
+#include "utils.h"
 
 static bool uint_cmp_char(unbounded_int u, const char *s) {
 	if(*s == '-' || *s == '+') {

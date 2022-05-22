@@ -2,7 +2,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include "strings.h"
+#include "utils.h"
 
 char *strip(const char *c) {
 	if(!c) return NULL;

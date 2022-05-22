@@ -1,5 +1,5 @@
-#ifndef PROJET_UNBOUNDED_INT_H
-#define PROJET_UNBOUNDED_INT_H
+#ifndef UNBOUNDED_INT_H
+#define UNBOUNDED_INT_H
 
 #include <stddef.h>
 
@@ -150,4 +150,4 @@ extern unbounded_int unbounded_int_quotient(unbounded_int a, unbounded_int b);
  */
 extern unbounded_int unbounded_int_modulo(unbounded_int a, unbounded_int b);
 
-#endif //PROJET_UNBOUNDED_INT_H
+#endif //UNBOUNDED_INT_H

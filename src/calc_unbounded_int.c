@@ -1,7 +1,7 @@
 #include <calc_unbounded_int.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include "strings.h"
+#include "utils.h"
 #include "arithmetic.h"
 
 #define MAX_LOAD_FACTOR 0.75
@@ -313,14 +313,12 @@ void interpret(interpreter *inter) {
 			char *name = strip(line), *value = strip(pos + 1);
 			interpret_assignment(inter, name, value);
 			free(name), free(value);
+		} else if(strncmp("exit", line, 4) == 0) {
+			free(line);
+			break;
 		} else if((pos = strchr(line, ' ')) != NULL) { // Command (print, free, cmp)
 			*pos = '\0';
 			char *command = strip(line), *args = strip(pos + 1);
-			if(strcmp("exit", command) == 0) {
-				free(command), free(args), free(line);
-				return;
-			}
-
 			interpret_command(inter, command, args);
 			free(command), free(args);
 		}

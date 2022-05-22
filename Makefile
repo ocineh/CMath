@@ -24,7 +24,7 @@ build/%.o: src/%.c include/%.h
 build/library.a: $(OBJECT_FILES)
 	ar -rcs build/library.a $(OBJECT_FILES)
 
-build/tests: build/library.a $(wildcard test/*.c)
+build/tests: build/library.a test/tests.c test/test_unbounded_int.c test/test_unbounded_int.h
 	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c build/library.a
 
 library: build/library.a
@@ -41,7 +41,7 @@ test: build/tests
 build: build/cli library
 	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
 
-all: build
+all: build/tests build
 
 run-example: build/cli
 	@printf "========================================================\n"

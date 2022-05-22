@@ -1,5 +1,5 @@
-#ifndef PROJET_TEST_UNBOUNDED_INT_H
-#define PROJET_TEST_UNBOUNDED_INT_H
+#ifndef TEST_UNBOUNDED_INT_H
+#define TEST_UNBOUNDED_INT_H
 
 #include <stdbool.h>
 
@@ -96,4 +96,4 @@ extern bool test_uint_difference_big_positive(void);
 extern bool test_uint_difference_big_negative(void);
 extern bool test_uint_difference_big_positive_and_negative(void);
 
-#endif //PROJET_TEST_UNBOUNDED_INT_H
+#endif //TEST_UNBOUNDED_INT_H

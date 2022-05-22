@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include "arithmetic.h"
-#include "strings.h"
+#include "utils.h"
 
 typedef enum operator {
 	ADD = '+', SUB = '-', MUL = '*', POW = '^', DIV = '/', MOD = '%', NONE = '\0'

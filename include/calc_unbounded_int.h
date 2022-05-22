@@ -1,5 +1,5 @@
-#ifndef PROJET_CALC_UNBOUNDED_INT_H
-#define PROJET_CALC_UNBOUNDED_INT_H
+#ifndef CALC_UNBOUNDED_INT_H
+#define CALC_UNBOUNDED_INT_H
 
 #include <string.h>
 #include <stdio.h>
@@ -97,4 +97,4 @@ extern unbounded_int eval(interpreter *inter, char *line);
  */
 extern void print(interpreter *inter, char *name);
 
-#endif //PROJET_CALC_UNBOUNDED_INT_H
+#endif //CALC_UNBOUNDED_INT_H

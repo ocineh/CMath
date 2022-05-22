@@ -1,5 +1,5 @@
-#ifndef PROJET_ARITHMETIC_H
-#define PROJET_ARITHMETIC_H
+#ifndef ARITHMETIC_H
+#define ARITHMETIC_H
 
 #include "unbounded_int.h"
 
@@ -38,4 +38,4 @@ extern unbounded_int evaluate(arithmetic *a);
  */
 extern void free_arithmetic(arithmetic *a);
 
-#endif //PROJET_ARITHMETIC_H
+#endif //ARITHMETIC_H

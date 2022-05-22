@@ -1,5 +1,5 @@
 #include <unbounded_int.h>
-#include <strings.h>
+#include <utils.h>
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>

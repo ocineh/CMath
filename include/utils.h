@@ -1,5 +1,5 @@
-#ifndef PROJET_STRINGS_H
-#define PROJET_STRINGS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 #include <ctype.h>
 #include <stdio.h>
@@ -16,7 +16,7 @@
  * @brief      Copy a string.
  * @param      s  The string
  */
-#define copy(s) concat(s)
+#define copy(s) strdup(s)
 
 /**
  * Remove spaces at start and end of the string
@@ -60,6 +60,12 @@ extern bool is_arithmetic_expression(const char *s);
  */
 extern char *remove_spaces(const char *s);
 
+/**
+ * Return if a string is empty, i.e. contains only spaces, tabs, newlines, etc.
+ *
+ * @param s a string
+ * @return if the string is empty
+ */
 extern bool is_empty(char *s);
 
 /**
@@ -71,4 +77,4 @@ extern bool is_empty(char *s);
  */
 extern bool valid_variable_name(char *name);
 
-#endif //PROJET_STRINGS_H
+#endif //UTILS_H
