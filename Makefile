@@ -9,12 +9,13 @@ OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))
 help:
 	@echo "Usage: make [target]"
 	@echo "Available targets:"
-	@echo "  library: Build the library of the project"
-	@echo "  build: Build the command line program"
+	@echo "  library:     Build the library of the project"
+	@echo "  build:       Build the command line program"
+	@echo "  all:         Alias for the 'build' target"
 	@echo "  run-example: Run the program with a sample input"
-	@echo "  test: Run the tests"
-	@echo "  clean: Clean the build directory"
-	@echo "  help: Print this message"
+	@echo "  test:        Run the tests"
+	@echo "  clean:       Clean the build directory"
+	@echo "  help:        Print this message"
 
 build/%.o: src/%.c include/%.h
 	@mkdir -p build
@@ -37,9 +38,10 @@ build/cli: build/library.a
 test: build/tests
 	./build/tests
 
-build: build/cli
-	@make library
+build: build/cli library
 	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
+
+all: build
 
 run-example: build/cli
 	@printf "========================================================\n"
