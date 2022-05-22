@@ -11,6 +11,13 @@ typedef struct memory memory;
 typedef struct interpreter interpreter;
 
 /**
+ * Create a new memory (hash table).
+ *
+ * @return a pointer to the new memory.
+ */
+extern memory *create_memory();
+
+/**
  * Create a new interpreter with the given file.
  *
  * @param input an input file
@@ -19,6 +26,13 @@ typedef struct interpreter interpreter;
  * @return a new interpreter
  */
 extern interpreter *create_interpreter(FILE *input, FILE *output, FILE *error);
+
+/**
+ * Destroy the given memory and free all the variables.
+ *
+ * @param mem the memory to destroy.
+ */
+extern void destroy_memory(memory *mem);
 
 /**
  * Destroy the interpreter and free all the memory used.

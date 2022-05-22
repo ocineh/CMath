@@ -30,7 +30,7 @@ typedef struct interpreter {
 	FILE *error;
 } interpreter;
 
-static memory *create_memory() {
+memory *create_memory() {
 	memory *mem = calloc(1, sizeof(memory));
 	if(mem == NULL) return NULL;
 	mem->size = INITIAL_CAPACITY, mem->used = 0, mem->marked = 0;
@@ -90,7 +90,7 @@ interpreter *create_interpreter(FILE *input, FILE *output, FILE *error) {
 	return interp;
 }
 
-static void destroy_memory(memory *mem) {
+void destroy_memory(memory *mem) {
 	if(mem == NULL) return;
 	for(size_t i = 0; i < mem->size; ++i) {
 		if(isUsed(mem, i)) {
