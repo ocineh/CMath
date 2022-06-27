@@ -1,11 +1,8 @@
-# Numbinator
+# unbounded_int
 
 A project for my second year of computer science degree. It
 is composed of a library to manipulate numbers of any size
 and a library of an interpreter.
-
-**HAMMOUCHE Hocine**<br>
-L2 Info-4 N°22006279
 
 ## Summary
 
