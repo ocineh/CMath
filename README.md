@@ -1,8 +1,7 @@
-# unbounded_int
+# CMath
 
 A project for my second year of computer science degree. It
-is composed of a library to manipulate numbers of any size
-and a library of an interpreter.
+is composed of a library to manipulate big_ints and an interpreter.
 
 ## Summary
 
@@ -38,18 +37,18 @@ written to **stderr**.
 ├─ Makefile
 ├─ src/                    (The source code of the library)
 │  ├─ arithmetic.c
-│  ├─ calc_unbounded_int.c
+│  ├─ interpreter.c
 │  ├─ utils.c
-│  └─ unbounded_int.c
+│  └─ big_int.c
 ├─ include/                (The header files of the library)
 │  ├─ arithmetic.h
-│  ├─ calc_unbounded_int.h
+│  ├─ interpreter.h
 │  ├─ utils.h
-│  └─ unbounded_int.h
+│  └─ big_int.h
 ├─ test/                   (The tests of the library)
 │  ├─ tests.c
-│  ├─ test_unbounded_int.c
-│  └─ test_unbounded_int.h
+│  ├─ test_big_int.c
+│  └─ test_big_int.h
 └─ cli/                    (The command line interface)
    └─ main.c
 ```
@@ -92,17 +91,17 @@ make test
   - [x] Print the help message
 - library
   - Operations on unbounded numbers
-    - [x] Create an unbounded_int from a string
-    - [x] Create an unbounded_int from a `long long int`
-    - [x] Transform an unbounded_int to a string
-    - [x] Compare two unbounded_int
-    - [x] Compare an unbounded_int and a `long long int`
-    - [x] Calculate the sum of two unbounded_int
-    - [x] Calculate the difference between two unbounded_int
-    - [x] Calculate the product of two unbounded_int
-    - [x] Calculate the quotient of two unbounded_int
-    - [x] Calculate the modulo of two unbounded_int
-    - [x] Calculate the power of two unbounded_int
+    - [x] Create a big_int from a string
+    - [x] Create a big_int from a `long long int`
+    - [x] Transform an big_int to a string
+    - [x] Compare two big_int
+    - [x] Compare a big_int and a `long long int`
+    - [x] Calculate the sum of two big_int
+    - [x] Calculate the difference between two big_int
+    - [x] Calculate the product of two big_int
+    - [x] Calculate the quotient of two big_int
+    - [x] Calculate the modulo of two big_int
+    - [x] Calculate the power of two big_int
   - Interpreter
     - [x] (Re)Assign a variable name with a value
     - [x] Evaluate an expression (arithmetic or assignment)

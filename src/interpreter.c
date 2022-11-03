@@ -1,4 +1,4 @@
-#include <calc_unbounded_int.h>
+#include <interpreter.h>
 #include <stdlib.h>
 #include <ctype.h>
 #include "utils.h"
@@ -13,7 +13,7 @@
 
 typedef struct variable {
 	char *name;
-	unbounded_int value;
+	big_int value;
 } variable;
 
 struct memory {
@@ -30,7 +30,7 @@ typedef struct interpreter {
 	FILE *error;
 } interpreter;
 
-memory *create_memory() {
+memory *create_memory(void) {
 	memory *mem = calloc(1, sizeof(memory));
 	if(mem == NULL) return NULL;
 	mem->size = INITIAL_CAPACITY, mem->used = 0, mem->marked = 0;
@@ -47,7 +47,7 @@ static size_t hash(const char *name, size_t size) {
 	return hash % size;
 }
 
-static variable *create_variable(const char *name, unbounded_int value) {
+static variable *create_variable(const char *name, big_int value) {
 	variable *v = calloc(1, sizeof(variable));
 	if(v == NULL) return NULL;
 	v->name = copy(name);
@@ -95,7 +95,7 @@ void destroy_memory(memory *mem) {
 	for(size_t i = 0; i < mem->size; ++i) {
 		if(isUsed(mem, i)) {
 			free(mem->vars[i]->name);
-			free_unbounded_int(&mem->vars[i]->value);
+			free_big_int(&mem->vars[i]->value);
 			free(mem->vars[i]);
 		}
 	}
@@ -112,7 +112,7 @@ void destroy_interpreter(interpreter *inter) {
 	free(inter);
 }
 
-unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
+big_int *assign(memory *mem, char *name, big_int u) {
 	if(mem == NULL || name == NULL || isNaN(u))
 		return NULL;
 	if(!valid_variable_name(name))
@@ -127,7 +127,7 @@ unbounded_int *assign(memory *mem, char *name, unbounded_int u) {
 	size_t h = hash(name, mem->size);
 	while(isUsed(mem, h)) {
 		if(strcmp(name, mem->vars[h]->name) == 0) {
-			free_unbounded_int(&mem->vars[h]->value);
+			free_big_int(&mem->vars[h]->value);
 			mem->vars[h]->value = u;
 			return &mem->vars[h]->value;
 		}
@@ -149,7 +149,7 @@ bool un_assign(memory *mem, char *name) {
 	size_t h = hash(name, mem->size);
 	while(!isFree(mem, h)) {
 		if(mem->vars[h]->name != NULL && strcmp(name, mem->vars[h]->name) == 0) {
-			free_unbounded_int(&mem->vars[h]->value);
+			free_big_int(&mem->vars[h]->value);
 			free(mem->vars[h]->name);
 			mem->vars[h]->name = NULL;
 			--mem->used, ++mem->marked;
@@ -160,7 +160,7 @@ bool un_assign(memory *mem, char *name) {
 	return false;
 }
 
-unbounded_int *value_of(memory *mem, char *name) {
+big_int *value_of(memory *mem, char *name) {
 	size_t h = hash(name, mem->size);
 	while(!isFree(mem, h)) {
 		if(mem->vars[h]->name != NULL && strcmp(name, mem->vars[h]->name) == 0)
@@ -171,10 +171,10 @@ unbounded_int *value_of(memory *mem, char *name) {
 }
 
 void print(interpreter *inter, char *name) {
-	unbounded_int *u = value_of(inter->memory, name);
+	big_int *u = value_of(inter->memory, name);
 	if(u == NULL) fprintf(inter->error, "Variable %s not found.\n", name);
 	else {
-		char *str = unbounded_int2string(*u);
+		char *str = big_int_to_string(*u);
 		fprintf(inter->output, "%s = %s\n", name, str);
 		free(str);
 	}
@@ -204,13 +204,13 @@ static char *replace_variable_name_by_value(interpreter *inter, char *str) {
 		if(result[begin] == '\0') break;
 		char *name = substring(result, begin, end);
 
-		unbounded_int *u = value_of(inter->memory, name);
+		big_int *u = value_of(inter->memory, name);
 		if(u == NULL) {
 			free(name);
 			free(result);
 			return NULL;
 		}
-		char *value = unbounded_int2string(*u);
+		char *value = big_int_to_string(*u);
 
 		char *left = substring(result, 0, begin);
 		char *right = substring(result, end, strlen(result));
@@ -227,11 +227,11 @@ static char *replace_variable_name_by_value(interpreter *inter, char *str) {
 	return result;
 }
 
-unbounded_int eval(interpreter *inter, char *line) {
+big_int eval(interpreter *inter, char *line) {
 	char *str = replace_variable_name_by_value(inter, line);
 	if(str == NULL || !is_arithmetic_expression(str)) return NaN;
 	arithmetic *a = string_to_arithmetic(str);
-	unbounded_int value = evaluate(a);
+	big_int value = evaluate(a);
 	free_arithmetic(a);
 	free(str);
 	return value;
@@ -252,12 +252,12 @@ static void interpret_command(interpreter *inter, char *command, char *args) {
 
 		*pos = '\0';
 		char *first = strip(args), *second = strip(pos + 1);
-		unbounded_int *u = value_of(inter->memory, first);
-		unbounded_int *v = value_of(inter->memory, second);
+		big_int *u = value_of(inter->memory, first);
+		big_int *v = value_of(inter->memory, second);
 		if(u == NULL || v == NULL)
 			fprintf(inter->error, "Variable %s not found.\n", u == NULL ? first : second);
 		else {
-			int cmp = unbounded_int_cmp_unbounded_int(*u, *v);
+			int cmp = big_int_cmp_big_int(*u, *v);
 			if(cmp == 0) fprintf(inter->output, "%s is equal to %s.\n", first, second);
 			else if(cmp < 0) fprintf(inter->output, "%s is less than %s.\n", first, second);
 			else fprintf(inter->output, "%s is greater than %s.\n", first, second);
@@ -274,13 +274,13 @@ static void interpret_assignment(interpreter *inter, char *name, char *value) {
 		return;
 	}
 
-	unbounded_int u = eval(inter, value);
+	big_int u = eval(inter, value);
 	if(isNaN(u)) {
 		fprintf(inter->error, "Invalid expression: %s = %s\n", name, value);
 		return;
 	}
 
-	unbounded_int *v = assign(inter->memory, name, u);
+	big_int *v = assign(inter->memory, name, u);
 	if(v == NULL) fprintf(inter->error, "Failled to assign the value with the variable name");
 }
 

@@ -1,7 +1,5 @@
-#include "arithmetic.h"
-#include <ctype.h>
-#include <stdlib.h>
 #include <stdarg.h>
+#include <malloc.h>
 #include "utils.h"
 
 char *strip(const char *c) {

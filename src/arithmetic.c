@@ -10,7 +10,7 @@ typedef struct cell {
 	operator operator;
 	struct cell *next;
 	struct cell *prev;
-	unbounded_int value;
+	big_int value;
 } cell;
 
 struct arithmetic {
@@ -25,7 +25,7 @@ static cell *operator_to_node(operator op) {
 	return n;
 }
 
-static cell *value_to_node(unbounded_int value) {
+static cell *value_to_node(big_int value) {
 	cell *n = calloc(1, sizeof(cell));
 	if(n == NULL) return NULL;
 	n->operator = NONE;
@@ -36,7 +36,7 @@ static cell *value_to_node(unbounded_int value) {
 static void free_node(cell *n) {
 	if(n == NULL) return;
 	if(n->operator == NONE)
-		free_unbounded_int(&n->value);
+		free_big_int(&n->value);
 	free(n);
 }
 
@@ -94,7 +94,7 @@ static void string_to_node(arithmetic *a, char *str) {
 		operator op = char_to_operator(*pos);
 
 		*pos = '\0';
-		unbounded_int u = string2unbounded_int(str);
+		big_int u = string_to_big_int(str);
 		cell *n = value_to_node(u);
 		add(a, n);
 		str = pos + 1;
@@ -104,7 +104,7 @@ static void string_to_node(arithmetic *a, char *str) {
 	}
 
 	if(*str != '\0') {
-		unbounded_int u = string2unbounded_int(str);
+		big_int u = string_to_big_int(str);
 		cell *n = value_to_node(u);
 		add(a, n);
 	}
@@ -147,7 +147,7 @@ char *arithmetic_to_string(arithmetic *a) {
 			free(res);
 			res = tmp;
 		} else {
-			node_str = unbounded_int2string(actual->value);
+			node_str = big_int_to_string(actual->value);
 			tmp = concat(res, node_str, " ");
 			free(res);
 			free(node_str);
@@ -159,14 +159,14 @@ char *arithmetic_to_string(arithmetic *a) {
 	return res;
 }
 
-static unbounded_int (*operator_to_function(operator op))(unbounded_int, unbounded_int) {
+static big_int (*operator_to_function(operator op))(big_int, big_int) {
 	switch(op) {
-		case ADD: return unbounded_int_somme;
-		case SUB: return unbounded_int_difference;
-		case MUL: return unbounded_int_produit;
-		case DIV: return unbounded_int_quotient;
-		case MOD: return unbounded_int_modulo;
-		case POW: return unbounded_int_pow;
+		case ADD: return unit_sum;
+		case SUB: return big_int_diff;
+		case MUL: return big_int_product;
+		case DIV: return big_int_quotient;
+		case MOD: return big_int_modulo;
+		case POW: return big_int_pow;
 		default: return NULL;
 	}
 }
@@ -175,8 +175,8 @@ static void evaluate_(arithmetic *a, char *match) {
 	cell *actual = a->first;
 	while(actual != NULL) {
 		if(actual->operator != NONE && strchr(match, actual->operator) != NULL) {
-			unbounded_int (*f)(unbounded_int, unbounded_int) = operator_to_function(actual->operator);
-			unbounded_int res = f(actual->prev->value, actual->next->value);
+			big_int (*f)(big_int, big_int) = operator_to_function(actual->operator);
+			big_int res = f(actual->prev->value, actual->next->value);
 
 			// Collapse the three nodes into one.
 			cell *n = value_to_node(res);
@@ -198,13 +198,13 @@ static void evaluate_(arithmetic *a, char *match) {
 	}
 }
 
-unbounded_int evaluate(arithmetic *a) {
+big_int evaluate(arithmetic *a) {
 	if(a != NULL && a->first != NULL) {
 		evaluate_(a, (char[]) { POW, '\0' });
 		evaluate_(a, (char[]) { MUL, DIV, MOD, '\0' });
 		evaluate_(a, (char[]) { ADD, SUB, '\0' });
 		if(a->first == a->last)
-			return copy_unbounded_int(&a->first->value);
+			return copy_big_int(&a->first->value);
 	}
 	return NaN;
 }

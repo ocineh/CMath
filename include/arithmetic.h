@@ -1,7 +1,7 @@
 #ifndef ARITHMETIC_H
 #define ARITHMETIC_H
 
-#include "unbounded_int.h"
+#include "big_int.h"
 
 /**
  * Represents a arithmetic expression in the form of a list.
@@ -29,7 +29,7 @@ extern char *arithmetic_to_string(arithmetic *a);
  *
  * @param a an arithmetic list
  */
-extern unbounded_int evaluate(arithmetic *a);
+extern big_int evaluate(arithmetic *a);
 
 /**
  * Free a tree and all its nodes recursively.

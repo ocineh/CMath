@@ -5,6 +5,7 @@ OPTIONS=-std=gnu11 -Iinclude -pedantic -Wall -g -Wextra -Wshadow -Wconversion -W
 COMPILE=$(COMPILER) $(OPTIONS) -O3
 SOURCE_FILES = $(wildcard src/*.c)
 OBJECT_FILES = $(patsubst src/%.c,build/%.o,$(SOURCE_FILES))
+TEST_FILES = $(wildcard test/*.c)
 
 help:
 	@echo "Usage: make [target]"
@@ -24,24 +25,23 @@ build/%.o: src/%.c include/%.h
 build/library.a: $(OBJECT_FILES)
 	ar -rcs build/library.a $(OBJECT_FILES)
 
-build/tests: build/library.a test/tests.c test/test_unbounded_int.c test/test_unbounded_int.h
-	$(COMPILE) -o build/tests test/tests.c test/test_unbounded_int.c build/library.a
+build/tests: build/library.a $(TEST_FILES)
+	$(COMPILE) -o build/tests $(TEST_FILES) build/library.a
 
-library: build/library.a
-	@make build/tests
+library: build/tests
 	@./build/tests > build/tests.log || (printf "\033[31mTests failed (see tests.log)\033[0m\n" && exit 1)
 	@printf "\033[32mTests passed\n\033[0m"
 
 build/cli: build/library.a
 	$(COMPILE) -o build/cli cli/main.c build/library.a
 
-test: build/tests
+tests: build/tests
 	./build/tests
 
 build: build/cli library
 	@printf "\033[32mYou can now run ./build/cli\n\033[0m"
 
-all: build/tests build
+all: build
 
 run-example: build/cli
 	@printf "========================================================\n"

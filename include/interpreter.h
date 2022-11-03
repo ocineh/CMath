@@ -1,10 +1,10 @@
-#ifndef CALC_UNBOUNDED_INT_H
-#define CALC_UNBOUNDED_INT_H
+#ifndef INTERPRETER_H
+#define INTERPRETER_H
 
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include "unbounded_int.h"
+#include "big_int.h"
 
 typedef struct memory memory;
 
@@ -15,7 +15,7 @@ typedef struct interpreter interpreter;
  *
  * @return a pointer to the new memory.
  */
-extern memory *create_memory();
+extern memory *create_memory(void);
 
 /**
  * Create a new interpreter with the given file.
@@ -60,7 +60,7 @@ extern void interpret(interpreter *inter);
  * @param u the value to assign
  * @return if the operation fails return NULL else a pointer
  */
-extern unbounded_int *assign(memory *mem, char *name, unbounded_int u);
+extern big_int *assign(memory *mem, char *name, big_int u);
 
 /**
  * Un-assign the value with the name of the variable.
@@ -79,7 +79,7 @@ extern bool un_assign(memory *mem, char *name);
  * @param name the name of a variable
  * @return if the variable exists return its value else NULL
  */
-extern unbounded_int *value_of(memory *mem, char *name);
+extern big_int *value_of(memory *mem, char *name);
 
 /**
  * Evaluates a string and returns the result of the operations.
@@ -87,7 +87,7 @@ extern unbounded_int *value_of(memory *mem, char *name);
  * @param line the operation to be evaluated
  * @return the result of the operation
  */
-extern unbounded_int eval(interpreter *inter, char *line);
+extern big_int eval(interpreter *inter, char *line);
 
 /**
  * Print the value of a variable.
@@ -97,4 +97,4 @@ extern unbounded_int eval(interpreter *inter, char *line);
  */
 extern void print(interpreter *inter, char *name);
 
-#endif //CALC_UNBOUNDED_INT_H
+#endif //INTERPRETER_H
