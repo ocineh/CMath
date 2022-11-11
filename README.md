@@ -58,9 +58,9 @@ written to **stderr**.
 1. clone the repository
 
 ```shell
-git clone https://github.com/ocineh/Numbinator.git
+git clone https://github.com/ocineh/CMath.git
 # or
-git clone git@github.com:ocineh/Numbinator.git
+git clone git@github.com:ocineh/CMath.git
 ```
 
 2. build the project or just the library
