@@ -9,4 +9,8 @@ void free_digits(digits* d);
 
 size_t digits_length(const digits* d);
 
+void digits_push_back(digits* d, char c);
+
+void digits_push_front(digits* d, char c);
+
 #endif //DIGITS_H
