@@ -30,3 +30,8 @@ void free_digits(digits* d) {
 	free(d->digits);
 	free(d);
 }
+
+size_t digits_length(const digits* d) {
+	if(d == NULL) return 0;
+	return d->length;
+}
