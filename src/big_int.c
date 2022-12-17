@@ -233,7 +233,7 @@ static big_int add_diff_sign(big_int *a, big_int *b) {
 	return NaN;
 }
 
-big_int unit_sum(big_int a, big_int b) {
+big_int big_int_sum(big_int a, big_int b) {
 	if(a.sign == '*' || b.sign == '*') return NaN;
 	if(isZERO(a)) return copy_big_int(&b);
 	if(isZERO(b)) return copy_big_int(&a);
@@ -254,7 +254,7 @@ big_int unit_sum(big_int a, big_int b) {
 big_int big_int_diff(big_int a, big_int b) {
 	// a - b = a + (-b) or a - (-b) = a + b
 	b.sign = b.sign == '-' ? '+' : '-';
-	big_int r = unit_sum(a, b);
+	big_int r = big_int_sum(a, b);
 	return r;
 }
 
@@ -345,7 +345,7 @@ big_int big_int_product(big_int a, big_int b) {
 			inter.sign = result.sign;
 			left_shift(&inter, rand);
 
-			tmp = unit_sum(result, inter);
+			tmp = big_int_sum(result, inter);
 			free_big_int(&inter);
 			free_big_int(&result);
 			result = tmp;
@@ -369,7 +369,7 @@ big_int big_int_pow(big_int u, big_int n) {
 		free_big_int(&result);
 		result = tmp;
 
-		tmp = unit_sum(n, pas); // n = n - 1
+		tmp = big_int_sum(n, pas); // n = n - 1
 		free_big_int(&n);
 		n = tmp;
 	}
@@ -413,7 +413,7 @@ static big_int big_int_division(big_int a, big_int b, bool modulo) {
 		remain = tmp;
 
 		if(!modulo) {
-			tmp = unit_sum(quotient, count);
+			tmp = big_int_sum(quotient, count);
 			free_big_int(&quotient);
 			quotient = tmp;
 		}

@@ -245,8 +245,8 @@ bool test_big_int_cmp_with_ll_negative_and_positive(void) {
 #define NEGATIVE random_ll(-1000000, 0)
 
 static bool test_big_int_sum(big_int u, big_int v, big_int w) {
-	big_int res1 = unit_sum(u, v);
-	big_int res2 = unit_sum(v, u);
+	big_int res1 = big_int_sum(u, v);
+	big_int res2 = big_int_sum(v, u);
 	bool result = big_int_cmp_big_int(res1, w) == 0 && big_int_cmp_big_int(res2, w) == 0;
 	free_big_int(&res1);
 	free_big_int(&res2);

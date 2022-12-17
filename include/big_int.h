@@ -94,7 +94,7 @@ extern int big_int_cmp_ll(big_int a, long long b);
  * @param b an instance of big_int
  * @return the sum of a and b
  */
-extern big_int unit_sum(big_int a, big_int b);
+extern big_int big_int_sum(big_int a, big_int b);
 
 /**
  * Calculates the difference between two big_int.

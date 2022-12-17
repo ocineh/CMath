@@ -161,7 +161,7 @@ char *arithmetic_to_string(arithmetic *a) {
 
 static big_int (*operator_to_function(operator op))(big_int, big_int) {
 	switch(op) {
-		case ADD: return unit_sum;
+		case ADD: return big_int_sum;
 		case SUB: return big_int_diff;
 		case MUL: return big_int_product;
 		case DIV: return big_int_quotient;
