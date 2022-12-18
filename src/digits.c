@@ -76,3 +76,8 @@ void digits_push_front(digits* d, char c) {
 		d->length++;
 	}
 }
+
+char digits_at(digits const* d, size_t i) {
+	if(d == NULL || d->digits == NULL || i >= d->length) return '\0';
+	return d->digits[(d->begin + i) % d->capacity];
+}
