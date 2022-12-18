@@ -89,6 +89,13 @@ void digits_pop_front(digits* d) {
 	}
 }
 
+void digits_pop_back(digits* d) {
+	if(d != NULL && d->digits != NULL && d->length > 0) {
+		d->end = (d->end == 0) ? d->capacity : d->end - 1;
+		d->length--;
+	}
+}
+
 digits* digits_copy(digits const* d) {
 	if(d == NULL || d->digits == NULL) return NULL;
 	digits* result = new_digits();

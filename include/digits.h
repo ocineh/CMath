@@ -17,6 +17,8 @@ char digits_at(const digits* d, size_t i);
 
 void digits_pop_front(digits* d);
 
+void digits_pop_back(digits* d);
+
 digits* digits_copy(const digits* d);
 
 #endif //DIGITS_H
