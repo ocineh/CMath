@@ -88,3 +88,15 @@ void digits_pop_front(digits* d) {
 		d->length--;
 	}
 }
+
+digits* digits_copy(digits const* d) {
+	if(d == NULL || d->digits == NULL) return NULL;
+	digits* result = new_digits();
+	if(result == NULL) return NULL;
+	change_capacity(result, d->capacity);
+	result->length = d->length;
+	result->begin = d->begin;
+	result->end = d->end;
+	memmove(result->digits, d->digits, d->capacity);
+	return result;
+}
