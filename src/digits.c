@@ -81,3 +81,10 @@ char digits_at(digits const* d, size_t i) {
 	if(d == NULL || d->digits == NULL || i >= d->length) return '\0';
 	return d->digits[(d->begin + i) % d->capacity];
 }
+
+void digits_pop_front(digits* d) {
+	if(d != NULL && d->digits != NULL && d->length > 0) {
+		d->begin = (d->begin + 1) % d->capacity;
+		d->length--;
+	}
+}

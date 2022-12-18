@@ -15,4 +15,6 @@ void digits_push_front(digits* d, char c);
 
 char digits_at(const digits* d, size_t i);
 
+void digits_pop_front(digits* d);
+
 #endif //DIGITS_H
